@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-sm bg-primary navbar-dark">
+    <a class="navbar-brand" href="#">
+        {% load static %}
+        <img src="{% static "scl/logo.png" %}" class="rounded" width="100">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerid" aria-controls="navbarTogglerid" aria-expanded="false" aria-label="toffle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerid">
+        <ul class="navbar-nav mr-auto ">
+            <li class="nav-item">
+                <a class="nav-link h4"  href="#">Résiliation |</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link h4"  href="#">Affaires |</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link h4"  href="#">Encaissement Manuel |</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link h4" href="#">Tableau de Bord</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-dark h4"  href="#">{{ request.user.username }}</a>
+            </li>
+        </ul>
+    </div>
+
+</nav>
