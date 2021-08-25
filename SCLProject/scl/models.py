@@ -3,6 +3,19 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+cpt_endommage = 'Compteur endommagé'
+cheque_vide = 'Chéque vide'
+fraude = 'Fraude'
+surcharge = 'Surcharge'
+
+TYPE_AFFAIRES =(
+    (cpt_endommage,cpt_endommage),
+    (cheque_vide,cheque_vide),
+    (fraude,fraude),
+    (surcharge,surcharge),
+)
+
+
 class resiliation(models.Model):
     nombreMois = models.PositiveIntegerField(null=False, default=0)
     redTableau = models.BigIntegerField(blank=True, default=0)
@@ -20,4 +33,15 @@ class resiliation(models.Model):
     def __str__(self) -> str:
         return super().__str__()
 
+
+class affaire(models.Model):
+    contrat = models.CharField(null=False, max_length=25)
+    libelle_affaire = models.CharField(choices=TYPE_AFFAIRES,max_length=30, null=False, default=fraude)
+    description_affaire = models.TextField(max_length=100, blank=True, null=True)
+    technicien = models.CharField(max_length=50, null=True, blank=True)
+    montant = models.DecimalField(null=True,decimal_places=0, default=0, max_length=50,max_digits=7)
+    user = models.ManyToManyField(User)
+
+    def __str__(self) -> str:
+        return super().__str__()
 
