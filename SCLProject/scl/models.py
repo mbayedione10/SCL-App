@@ -15,6 +15,13 @@ TYPE_AFFAIRES =(
     (surcharge,surcharge),
 )
 
+espece = 'Espéces'
+cheque = 'Chéque'
+
+PAYMENT_MODE = (
+    (espece,espece),
+    (cheque,cheque),
+)
 
 class resiliation(models.Model):
     nombreMois = models.PositiveIntegerField(null=False, default=0)
@@ -41,6 +48,21 @@ class affaire(models.Model):
     technicien = models.CharField(max_length=50, null=True, blank=True)
     montant = models.DecimalField(null=True,decimal_places=0, default=0, max_length=50,max_digits=7)
     user = models.ManyToManyField(User)
+    date_ajout = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return super().__str__()
+
+class manuel(models.Model):
+    motif_reglement = models.CharField(max_length=50,null=False)
+    contrat = models.CharField(null=True,blank=True, max_length=25)
+    mode_payement = models.CharField(choices=PAYMENT_MODE,max_length=30, null=True, blank=True)
+    village = models.CharField(max_length=50, blank=True)
+    montant = models.DecimalField(null=True,decimal_places=0, default=0, max_length=50,max_digits=7)
+    user = models.ManyToManyField(User)
+    date_ajout = models.DateTimeField(auto_now_add=True)
+    nom_client = models.CharField(max_length=50, blank=True)
+    contact_client = models.CharField(max_length=20, blank=True)
 
     def __str__(self) -> str:
         return super().__str__()
