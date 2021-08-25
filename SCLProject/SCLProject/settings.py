@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'scl',
+    'crispy_forms',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -126,3 +127,5 @@ STATIC_ROOT = Path(BASE_DIR,'static')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CRISPY_TEMPLATE_PACK = 'bootstap4'
