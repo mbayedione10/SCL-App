@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-sm navbar-dark">
-    <a class="navbar-brand" href="#">
+    <a class="navbar-brand" href="{% url 'index' %}">
         {% load static %}
         <img src="{% static "scl/logo.png" %}" class="rounded" width="100">
     </a>
@@ -16,7 +16,7 @@
                 <a class="nav-link h4"  href="#">Affaires |</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link h4"  href="#">Encaissement Manuel |</a>
+                <a class="nav-link h4"  href="{% url 'manuel' %}">Encaissement Manuel |</a>
             </li>
 
             <li class="nav-item">
