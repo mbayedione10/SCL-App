@@ -24,7 +24,7 @@ PAYMENT_MODE = (
 )
 
 class resiliation(models.Model):
-    nombreMois = models.PositiveIntegerField(null=False, default=0)
+    nombre_mois = models.PositiveIntegerField(null=False, default=0)
     redTableau = models.BigIntegerField(blank=True, default=0)
     frais_coupure = models.IntegerField(null=False, default=0)
     frais_retard = models.IntegerField(null=False, default=0)

@@ -16,5 +16,5 @@ class ResiliationForm(ModelForm):
 
         fields = [
             "contrat",
-            "nombreMois"            
+            "nombre_mois"            
             ]
