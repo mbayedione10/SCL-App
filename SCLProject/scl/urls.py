@@ -6,6 +6,7 @@ urlpatterns = [
     path('', Index.as_view(), name='index'),
     path('manuel/', AjouterManuel.as_view(), name='manuel'),
     path('resiliation/', AjouterResiliation.as_view(), name='resiliation'),
+    path('affaire/',AjouterAffaire.as_view(), name='affaire'),
 
 ]
 #urlpatterns += static(se)

@@ -18,3 +18,10 @@ class ResiliationForm(ModelForm):
             "contrat",
             "nombre_mois"            
             ]
+
+class AffaireForm(ModelForm):
+    class Meta:
+        model = affaire
+        exclude = ['user','date_ajout']
+        fields = '__all__'
+

@@ -27,3 +27,12 @@ class AjouterResiliation(View):
             'form': form,
         }
         return render(request,'scl/resiliation.html', context)
+
+
+class AjouterAffaire(View):
+    def get(self, request, *args, **kwargs):
+        form = AffaireForm
+        context={
+            'form': form
+        }
+        return render(request,'scl/affaire.html',context)
