@@ -8,3 +8,13 @@ class ManuelForm(ModelForm):
 
         exclude = ['user','date_ajout']
         fields = '__all__'
+
+
+class ResiliationForm(ModelForm):
+    class Meta:
+        model = resiliation
+
+        fields = [
+            "contrat",
+            "nombreMois"            
+            ]

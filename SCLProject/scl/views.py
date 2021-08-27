@@ -1,3 +1,4 @@
+from typing import ContextManager
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -16,3 +17,13 @@ class AjouterManuel(View):
             'form': form,
         }
         return render(request, 'scl/manuel.html', context)
+
+
+
+class AjouterResiliation(View):
+    def get(self, request, *args, **kwargs):
+        form = ResiliationForm
+        context = {
+            'form': form,
+        }
+        return render(request,'scl/resiliation.html', context)
