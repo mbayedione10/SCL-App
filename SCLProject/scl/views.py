@@ -1,5 +1,6 @@
 from datetime import date
 from django.shortcuts import render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Create your views here.
 from django.views import View
@@ -7,12 +8,15 @@ from .forms import *
 from django.utils import timezone
 
 
-class Index(View):
+class Index(LoginRequiredMixin, UserPassesTestMixin,View):
     def get(self, request):
         return render(request, 'scl/index.html')
 
+    def test_func(self):
+        return self.request.user.groups.all()
 
-class AjouterManuel(View):
+
+class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, *args, **kwargs):
         form = ManuelForm()
         context = {
@@ -37,11 +41,14 @@ class AjouterManuel(View):
                 newManuel.save()
 
         return redirect('index')
+    
+    def test_func(self):
+        return self.request.user.groups.all()
 
 
 
 
-class AjouterResiliation(View):
+class AjouterResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, *args, **kwargs):
         form = ResiliationForm
         context = {
@@ -49,8 +56,13 @@ class AjouterResiliation(View):
         }
         return render(request,'scl/resiliation.html', context)
 
+    
 
-class AjouterAffaire(View):
+    def test_func(self):
+        return self.request.user.groups.all()
+
+
+class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, *args, **kwargs):
         form = AffaireForm
         context={
@@ -76,3 +88,6 @@ class AjouterAffaire(View):
                 
 
         return redirect('index')
+    
+    def test_func(self):
+        return self.request.user.groups.all()
