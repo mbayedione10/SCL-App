@@ -1,9 +1,10 @@
+from datetime import date
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.views import View
 from .forms import *
-from django.utils.timezone import datetime
+from django.utils import timezone
 
 
 class Index(View):
@@ -18,6 +19,25 @@ class AjouterManuel(View):
             'form': form,
         }
         return render(request, 'scl/manuel.html', context)
+
+    def post(self, request, *args, **kwargs):
+        form = ManuelForm(request.POST)
+
+        if 'save' in request.POST:
+            if form.is_valid():
+                # Add manuel and excluded fields in form
+                newManuel = form.save()
+
+                newManuel.date_ajout = timezone.datetime.now(tz=timezone.utc)
+                list_id=[]
+                user_id = request.user.id
+                list_id.append(user_id)
+                newManuel.user.add(*list_id)
+
+                newManuel.save()
+
+        return redirect('index')
+
 
 
 
@@ -46,7 +66,7 @@ class AjouterAffaire(View):
             if form.is_valid():
                 #Save form and add user and date
                 newAffaire =form.save()
-                newAffaire.date_ajout= datetime.now()
+                newAffaire.date_ajout= timezone.datetime.now(tz=timezone.utc)
                 list_id = []
                 user_id= request.user.id
                 list_id.append(user_id)
@@ -55,4 +75,4 @@ class AjouterAffaire(View):
                 newAffaire.save()
                 
 
-            return redirect('index')
+        return redirect('index')
