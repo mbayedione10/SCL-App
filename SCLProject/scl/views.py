@@ -13,7 +13,7 @@ class Index(LoginRequiredMixin, UserPassesTestMixin,View):
         return render(request, 'scl/index.html')
 
     def test_func(self):
-        return self.request.user.groups.all()
+        return self.request.user.is_authenticated
 
 
 class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
