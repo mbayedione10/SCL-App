@@ -152,4 +152,15 @@ ACCOUNT_ADAPTER = 'scl.account_adapter.NoNewUsersAccountAdapter'
 LOGIN_REDIRECT_URL = 'index'
 
 ACCOUNT_AUTHENTICATION_METHOD ='username_email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_UNIQUE_EMAIL =True
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_POST = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'mbayedione10@gmail.com'
+EMAIL_HOST_PASSWORD = 'Password'
 
