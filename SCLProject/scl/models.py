@@ -38,7 +38,7 @@ class resiliation(models.Model):
     user = models.ManyToManyField(User)
 
     def __str__(self) -> str:
-        return super().__str__()
+        return f'Resiliation: {self.contrat}'
 
 
 class affaire(models.Model):
@@ -51,7 +51,7 @@ class affaire(models.Model):
     date_ajout = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return super().__str__()
+        return f'Affaire: {self.contrat}'
 
 class manuel(models.Model):
     motif_reglement = models.CharField(max_length=50,null=False)
@@ -65,5 +65,5 @@ class manuel(models.Model):
     contact_client = models.CharField(max_length=20, blank=True)
 
     def __str__(self) -> str:
-        return super().__str__()
+        return f'Manuel: {self.motif_reglement}'
 
