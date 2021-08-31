@@ -18,10 +18,16 @@
             <li class="nav-item">
                 <a class="nav-link h4"  href="{% url 'manuel' %}">Encaissement Manuel |</a>
             </li>
-
-            <li class="nav-item">
-                <a class="nav-link h4" href="#">Rapports</a>
-            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle h4" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Rapports</a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="#">Résiliation</a>
+                  <a class="dropdown-item" href="#">Affaires</a>
+                  <a class="dropdown-item" href="#">Manuel</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="#">General</a>
+                </div>
+              </li>
         </ul>
         <ul class="navbar-nav">
             <li class="nav-item">
