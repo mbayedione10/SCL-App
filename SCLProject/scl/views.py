@@ -55,6 +55,32 @@ class AjouterResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
             'form': form,
         }
         return render(request,'scl/resiliation.html', context)
+    
+    def post(self, request, *args, **kwargs):
+        form = ResiliationForm(request.POST)
+        if 'save' in request.POST:
+            if form.is_valid():
+                newResiliation = form.save()
+                newResiliation.redTableau = 429*newResiliation.nombre_mois
+                if newResiliation.nombre_mois>0:
+                    newResiliation.is_paid = True
+                    newResiliation.frais_coupure = 2000
+                    newResiliation.frais_retard = 500*newResiliation.nombre_mois
+                    newResiliation.tva = 0.18*(newResiliation.redTableau+newResiliation.frais_coupure)
+                    newResiliation.montant_ttc = newResiliation.redTableau + newResiliation.frais_coupure + newResiliation.frais_retard + newResiliation.tva
+                    if newResiliation.montant_ttc > 20000:
+                        newResiliation.timbre = 0.01*newResiliation.montant_ttc
+                    else:
+                        newResiliation.timbre = 0
+                    newResiliation.montant_a_payer = newResiliation.montant_ttc + newResiliation.timbre
+                newResiliation.date_ajout = timezone.datetime.now(tz=timezone.utc)
+                list_id = []
+                user_id = request.user.id
+                list_id.append(user_id)
+                newResiliation.user.add(*list_id)
+                newResiliation.save()
+        
+        return redirect('index')
 
     
 

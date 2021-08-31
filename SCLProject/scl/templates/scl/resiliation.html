@@ -5,7 +5,7 @@
 <section>
     <div class="container mb-5">
         <div class="row justify-content-center mt-5">
-            <div class="col-md-12 col-sm-12 p-4  font-weight-bold purple-text">
+            <div class="col-md-12 col-sm-12 p-4  font-weight-bold blue-text">
                 <form action="#" method="POST">
 
                     {% csrf_token %}
@@ -18,7 +18,7 @@
                     </div>
                     <!--Button trigger modal-->
                     <div class="row justify-content-center">
-                        <button type="button" class="btn btn-purple" name="save" data-toggle="modal" data-target="#submitModal">Ajouter</button>
+                        <button type="button" name="ajout" class="btn btn-blue" data-toggle="modal" data-target="#submitModal">Ajouter</button>
                     </div>
                    
                     
@@ -32,11 +32,11 @@
                                 </div>
                                 <div class="modal-body">
                                     <!--Ajouter variable TTC {{ ttc }}-->
-                                    <p class="text-center">Confirmer la resiliation pour un montant TTC de </p>
+                                    <p class="text-center">Confirmer la resiliation de ce client </p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-light" data-dismiss="modal">Retour</button>
-                                    <button type="button" class="btn btn-purple">Ajouter</button>
+                                    <button type="submit" name="save" class="btn btn-blue">Ajouter</button>
                                 </div>
                             </div>
                         </div>
