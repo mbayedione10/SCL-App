@@ -118,7 +118,7 @@ class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
         return self.request.user.groups.all()
 
-
+# TODO PRINT onlytable with information
 class ResiliationDashboard(View):
     def get(self, request, *args, **kwargs):
 
@@ -145,7 +145,6 @@ class ResiliationDashboard(View):
             all_resiliation.append(resiliation_date)
         
         all_resiliation.sort(key=lambda item:item['date_ajout'], reverse=True)
-        # print(all_resiliation)
 
         context = {
             'resiliation': all_resiliation,
