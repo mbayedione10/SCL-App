@@ -7,6 +7,7 @@ urlpatterns = [
     path('manuel/', AjouterManuel.as_view(), name='manuel'),
     path('resiliation/', AjouterResiliation.as_view(), name='resiliation'),
     path('affaire/',AjouterAffaire.as_view(), name='affaire'),
+    path('resiliation/dashboard/', ResiliationDashboard.as_view(), name='resiliationDashboard' )
 
 ]
 #urlpatterns += static(se)

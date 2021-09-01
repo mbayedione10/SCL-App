@@ -117,3 +117,40 @@ class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
     
     def test_func(self):
         return self.request.user.groups.all()
+
+
+class ResiliationDashboard(View):
+    def get(self, request, *args, **kwargs):
+
+        resil = resiliation.objects.all()
+        nombreResiliation = 0
+        montantTotal = 0
+        all_resiliation = []
+        
+        # if request.user.groups.filter(name='Caissier'):
+        for name in resil:
+            added_by = [user.username for user in User.objects.filter(resiliation=name)]
+            montantTotal += name.montant_a_payer
+            nombreResiliation += 1
+            resiliation_date = {
+                'id_resiliation': name.id,
+                'date_ajout': name.date_ajout,
+                'contrat': name.contrat,
+                'montant_a_payer': name.montant_a_payer,
+                'timbre': name.timbre,
+                'montant_ttc': name.montant_ttc,
+                'tva': name.tva,
+                'caissier': added_by[0],
+            }
+            all_resiliation.append(resiliation_date)
+        
+        all_resiliation.sort(key=lambda item:item['date_ajout'], reverse=True)
+        # print(all_resiliation)
+
+        context = {
+            'resiliation': all_resiliation,
+            'nombre_resiliation': nombreResiliation,
+            'montant_total': montantTotal
+        }
+
+        return render(request,'scl/resiliationDashboard.html',context)
