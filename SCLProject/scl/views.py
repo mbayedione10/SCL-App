@@ -121,11 +121,10 @@ class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
         return self.request.user.groups.all()
 
 # TODO PRINT only table with information
-# TODO SET TODAY's resil as default for dashboard
+today = datetime.today()
 class ResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-
-        resil = resiliation.objects.all()
+        resil = resiliation.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
         nombreResiliation = 0
         montantTotal = 0
         all_resiliation = []
@@ -241,7 +240,7 @@ class SearchResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
 
 class AffaireDashboard(View):
     def get(self, request, *args, **kwargs):
-        aff = affaire.objects.all()
+        aff = affaire.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
         nombreAffaire = 0
         montantTotal = 0
         all_affaire = []
@@ -340,7 +339,7 @@ class SearchAffaireDashboard(View):
 
 class ManuelDashboard(View):
     def get(self, request, *args, **kwargs):
-        encaissement = manuel.objects.all()
+        encaissement = manuel.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
         nombreManuel = 0
         montantTotal = 0
         all_manuel = []
