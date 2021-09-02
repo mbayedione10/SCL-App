@@ -338,3 +338,102 @@ class SearchAffaireDashboard(View):
         
         return render(request,'scl/affaireDashboard.html', context)
 
+class ManuelDashboard(View):
+    def get(self, request, *args, **kwargs):
+        encaissement = manuel.objects.all()
+        nombreManuel = 0
+        montantTotal = 0
+        all_manuel = []
+        user_id = request.user.id
+        if request.user.groups.filter(name='Caissier'):
+            encaissement = manuel.objects.filter(user = user_id)
+            for manu in encaissement:
+                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
+                nombreManuel +=1
+                montantTotal += manu.montant
+                manuel_data = {
+                    'id_manuel': manu.id,
+                    'date_ajout': manu.date_ajout,
+                    'contrat': manu.contrat,
+                    'nom_client': manu.nom_client,
+                    'motif_reglement': manu.motif_reglement,
+                    'mode_payement': manu.mode_payement,
+                    'montant': manu.montant,
+                    'caissier': added_by[0]
+                }
+                all_manuel.append(manuel_data)
+        else:
+            for manu in encaissement:
+                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
+                nombreManuel +=1
+                montantTotal += manu.montant
+                manuel_data = {
+                    'id_manuel': manu.id,
+                    'date_ajout': manu.date_ajout,
+                    'contrat': manu.contrat,
+                    'nom_client': manu.nom_client,
+                    'motif_reglement': manu.motif_reglement,
+                    'mode_payement': manu.mode_payement,
+                    'montant': manu.montant,
+                    'caissier': added_by[0]
+                    }
+                all_manuel.append(manuel_data)
+            
+        context={
+            'manuel': all_manuel,
+            'nombre_manuel': nombreManuel,
+            'montant_total': montantTotal
+        }
+        return render(request, 'scl/manuelDashboard.html', context)
+
+
+class SearchManuelDashboard(View):
+    def get(self, request, *args, **kwargs):
+        query = self.request.GET.get("q")
+        query_date_filter = datetime.strptime(query,"%Y-%m-%d")
+
+        encaissement = manuel.objects.filter(Q(date_ajout__icontains=query))
+        nombreManuel = 0
+        montantTotal = 0
+        all_manuel = []
+        user_id = request.user.id
+        if request.user.groups.filter(name='Caissier'):
+            encaissement = manuel.objects.filter(user = user_id, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
+            for manu in encaissement:
+                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
+                nombreManuel +=1
+                montantTotal += manu.montant
+                manuel_data = {
+                    'id_manuel': manu.id,
+                    'date_ajout': manu.date_ajout,
+                    'contrat': manu.contrat,
+                    'nom_client': manu.nom_client,
+                    'motif_reglement': manu.motif_reglement,
+                    'mode_payement': manu.mode_payement,
+                    'montant': manu.montant,
+                    'caissier': added_by[0]
+                }
+                all_manuel.append(manuel_data)
+        else:
+            for manu in encaissement:
+                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
+                nombreManuel +=1
+                montantTotal += manu.montant
+                manuel_data = {
+                    'id_manuel': manu.id,
+                    'date_ajout': manu.date_ajout,
+                    'contrat': manu.contrat,
+                    'nom_client': manu.nom_client,
+                    'motif_reglement': manu.motif_reglement,
+                    'mode_payement': manu.mode_payement,
+                    'montant': manu.montant,
+                    'caissier': added_by[0]
+                    }
+                all_manuel.append(manuel_data)
+            
+        context={
+            'manuel': all_manuel,
+            'nombre_manuel': nombreManuel,
+            'montant_total': montantTotal
+        }
+        return render(request, 'scl/manuelDashboard.html', context)

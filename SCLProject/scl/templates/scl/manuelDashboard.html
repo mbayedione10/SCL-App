@@ -1,0 +1,91 @@
+{% extends 'scl/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-3">
+        <div class="card col-md-4 mr-3">
+            <h5 class="text-center pt-2">Montant Reçu</h5>
+            <h5 class="text-center" style="color: blue;">{{ montant_total }}</h5>
+        </div>
+        <div class="card col-md-4 mr-3">
+            <h5 class="text-center pt-2">Nombre</h5>
+            <h5 class="text-center" style="color: blue;">{{ nombre_manuel }}</h5>
+        </div>
+    </div>
+    <div class="row mt-2 justify-content-end">
+        <div class="col-md-3 col-sm-6">
+            <form method="GET" action="{% url 'manuel-search' %}">
+            <div class="md-form mt-0 active-cyan-2">
+                <input type="date" name="q" class="form-control" aria-label="Search" required value="{{ request.GET.q }}">
+                <button type="submit" class="btn btn-blue" data-toggle="modal">Rechercher</button><a href="{% url 'manuelDashboard' %}">Retour</a>
+            </div>
+        </form>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-12">
+
+            <table class="table table-hover table-striped table-bordered text-white" style="text-align: center;">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Contrat</th>
+                        <th scope="col">Caissier</th>
+                        <th scope="col">Nom Client</th>
+                        <th scope="col">Motif</th>
+                        <th scope="col">Mode Payement</th>
+                        <th scope="col">Montant</th>
+                        <th colspan="2">Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for manu in manuel %}
+                    <tr>
+                        <th scope="row">{{ manu.id_manuel}}</th>
+                        <td>{{ manu.date_ajout }}</td>
+                        <td>{{ manu.contrat }}</td>
+                        <td>{{ manu.caissier }}</td>
+                        {% if manu.nom_client == None %}
+                        <td></td>
+                        {% else %}
+                        <td>{{ manu.nom_client }}</td>
+                        {% endif %}
+                        {% if manu.motif_reglement == None %}
+                        <td></td>
+                        {% else %}
+                        <td>{{ manu.motif_reglement }}</td>
+                        {% endif %}
+                        <td>{{ manu.mode_payement }}</td>
+                        <td>{{ manu.montant }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                       <th colspan="7"> <h4>Total</th></h5>
+                        <td>{{ montant_total }}</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+        <button type="submit" class="btn btn-success"  onClick="window.print()">Imprimer</button>
+        <button id="btnExport" type="submit" class="btn btn-light" onclick="exportReportToExcel(this)">Excel</button>
+    </div>
+</div>
+
+<script>
+function exportReportToExcel() {
+  let table = document.getElementsByTagName("table"); // you can use document.getElementById('tableId') as well by providing id to the table tag
+  let today = new Date().toISOString().slice(0, 10)
+  TableToExcel.convert(table[0], { // html code may contain multiple tables so here we are refering to 1st table tag
+    name: today+` encaissementManuel.xlsx`, // fileName you could use any name
+    sheet: {
+      name: 'Sheet 1' // sheetName
+    }
+  });
+}
+</script>
+
+
+
+{% endblock content %}

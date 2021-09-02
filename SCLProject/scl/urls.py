@@ -11,6 +11,9 @@ urlpatterns = [
     path('resiliation/search', SearchResiliationDashboard.as_view(), name='resiliation-search' ),
     path('affaire/dashboard', AffaireDashboard.as_view(), name='affaireDashboard'),
     path('affaire/search', SearchAffaireDashboard.as_view(), name='affaire-search' ),
+    path('manuel/dashboard', ManuelDashboard.as_view(), name='manuelDashboard'),
+    path('manuel/search', SearchManuelDashboard.as_view(), name='manuel-search' ),
+    
 
 
 ]
