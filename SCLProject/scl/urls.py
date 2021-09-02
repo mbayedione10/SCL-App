@@ -8,7 +8,9 @@ urlpatterns = [
     path('resiliation/', AjouterResiliation.as_view(), name='resiliation'),
     path('affaire/',AjouterAffaire.as_view(), name='affaire'),
     path('resiliation/dashboard/', ResiliationDashboard.as_view(), name='resiliationDashboard' ),
-    path('resiliation/search', SearchResiliationDashboard.as_view(), name='resiliation-search' )
+    path('resiliation/search', SearchResiliationDashboard.as_view(), name='resiliation-search' ),
+    path('affaire/dashboard', AffaireDashboard.as_view(), name='affaireDashboard'),
+    path('affaire/search', SearchAffaireDashboard.as_view(), name='affaire-search' ),
 
 
 ]

@@ -1,4 +1,5 @@
 from datetime import date, datetime, tzinfo
+from typing import ContextManager
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
@@ -237,3 +238,103 @@ class SearchResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
 
     def test_func(self):
         return self.request.user.groups.all()
+
+class AffaireDashboard(View):
+    def get(self, request, *args, **kwargs):
+        aff = affaire.objects.all()
+        nombreAffaire = 0
+        montantTotal = 0
+        all_affaire = []
+        user_id = request.user.id
+
+        if request.user.groups.filter(name='Caissier'):
+            aff= affaire.objects.filter(user=user_id)
+            for case in aff:
+                montantTotal += case.montant
+                nombreAffaire += 1
+                added_by = [user.username for user in User.objects.filter(affaire=case)]
+                affaire_data = {
+                    'caissier': added_by[0],
+                    'id_affaire': case.id,
+                    'date_ajout': case.date_ajout,
+                    'contrat': case.contrat,
+                    'libelle': case.libelle_affaire,
+                    'technicien': case.technicien,
+                    'montant': case.montant,
+                }
+                all_affaire.append(affaire_data)
+        else:
+            for case in aff:
+                montantTotal += case.montant
+                nombreAffaire += 1
+                added_by = [user.username for user in User.objects.filter(affaire=case)]
+                affaire_data = {
+                    'caissier': added_by[0],
+                    'id_affaire': case.id,
+                    'date_ajout': case.date_ajout,
+                    'contrat': case.contrat,
+                    'libelle': case.libelle_affaire,
+                    'technicien': case.technicien,
+                    'montant': case.montant,
+                }
+                all_affaire.append(affaire_data)
+
+        context = {
+            'montant_total': montantTotal,
+            'affaire': all_affaire,
+            'nombre_affaire': nombreAffaire
+        }
+        
+        return render(request,'scl/affaireDashboard.html', context)
+
+class SearchAffaireDashboard(View):
+    def get(self, request, *args, **kwargs):
+        query = self.request.GET.get("q")
+        query_date_filter = datetime.strptime(query,"%Y-%m-%d")
+
+        aff = affaire.objects.filter(Q(date_ajout__icontains=query))
+        nombreAffaire = 0
+        montantTotal = 0
+        all_affaire = []
+        user_id = request.user.id
+
+        if request.user.groups.filter(name='Caissier'):
+            aff= affaire.objects.filter(user=user_id, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
+            for case in aff:
+                montantTotal += case.montant
+                nombreAffaire += 1
+                added_by = [user.username for user in User.objects.filter(affaire=case)]
+                affaire_data = {
+                    'caissier': added_by[0],
+                    'id_affaire': case.id,
+                    'date_ajout': case.date_ajout,
+                    'contrat': case.contrat,
+                    'libelle': case.libelle_affaire,
+                    'technicien': case.technicien,
+                    'montant': case.montant,
+                }
+                all_affaire.append(affaire_data)
+        else:
+            for case in aff:
+                montantTotal += case.montant
+                nombreAffaire += 1
+                added_by = [user.username for user in User.objects.filter(affaire=case)]
+                affaire_data = {
+                    'caissier': added_by[0],
+                    'id_affaire': case.id,
+                    'date_ajout': case.date_ajout,
+                    'contrat': case.contrat,
+                    'libelle': case.libelle_affaire,
+                    'technicien': case.technicien,
+                    'montant': case.montant,
+                }
+                all_affaire.append(affaire_data)
+
+        context = {
+            'montant_total': montantTotal,
+            'affaire': all_affaire,
+            'nombre_affaire': nombreAffaire
+        }
+        
+        return render(request,'scl/affaireDashboard.html', context)
+
