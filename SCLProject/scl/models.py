@@ -58,7 +58,7 @@ class manuel(models.Model):
     contrat = models.CharField(null=True,blank=True, max_length=25)
     mode_payement = models.CharField(choices=PAYMENT_MODE,max_length=30, null=True, blank=True)
     village = models.CharField(max_length=50, blank=True)
-    montant = models.IntegerField(null=True, default=0, max_length=50)
+    montant = models.IntegerField(null=False, max_length=50)
     user = models.ManyToManyField(User)
     date_ajout = models.DateTimeField(auto_now_add=True)
     nom_client = models.CharField(max_length=50, blank=True)
