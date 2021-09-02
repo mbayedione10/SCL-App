@@ -13,6 +13,8 @@ urlpatterns = [
     path('affaire/search', SearchAffaireDashboard.as_view(), name='affaire-search' ),
     path('manuel/dashboard', ManuelDashboard.as_view(), name='manuelDashboard'),
     path('manuel/search', SearchManuelDashboard.as_view(), name='manuel-search' ),
+
+    path('dashboard', Dashboard.as_view(), name='dashboard'),
     
 
 

@@ -436,3 +436,45 @@ class SearchManuelDashboard(View):
             'montant_total': montantTotal
         }
         return render(request, 'scl/manuelDashboard.html', context)
+
+
+class Dashboard(View):
+    def get(self, request, *args, **kwargs):
+        montants = []
+        montant_resiliation = 0
+        montant_affaire = 0
+        montant_manuel = 0
+
+        user_id = [user.id for user in User.objects.all()]
+        user =[user.username for user in User.objects.all()]
+
+        
+        for name in user_id:
+            added_by = [user.username for user in User.objects.filter(id = name)]
+            encaissement = manuel.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+            aff = affaire.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+            resil = resiliation.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+            print(added_by)
+            for manu in encaissement:
+                montant_manuel += manu.montant
+            for cancel in resil:
+                montant_resiliation += cancel.montant_a_payer
+            for case in aff:
+                montant_affaire += case.montant
+            global_user = {
+                'nom': added_by[0],
+                'montant_manuel': montant_manuel,
+                'montant_resiliation': montant_resiliation,
+                'montant_affaire': montant_affaire
+            }
+
+            montants.append(global_user)
+            montant_manuel=0
+            montant_resiliation=0
+            montant_affaire=0
+            print(montants)
+        context={
+            'montants': montants,
+        }
+
+        return render (request, 'scl/dashboard.html', context)
