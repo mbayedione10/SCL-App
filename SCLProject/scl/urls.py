@@ -15,6 +15,7 @@ urlpatterns = [
     path('manuel/search', SearchManuelDashboard.as_view(), name='manuel-search' ),
 
     path('dashboard', Dashboard.as_view(), name='dashboard'),
+    path('dashboard/search', SearchDashboard.as_view(), name='dashboard-search' ),
     
 
 

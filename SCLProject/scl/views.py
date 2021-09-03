@@ -498,7 +498,51 @@ class Dashboard(LoginRequiredMixin, UserPassesTestMixin, View):
                 montant_manuel=0
                 montant_resiliation=0
                 montant_affaire=0
-                print(montants)
+        context={
+            'montants': montants,
+        }
+
+        return render (request, 'scl/dashboard.html', context)
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin')
+
+class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
+    def get(self, request, *args, **kwargs):
+        query = self.request.GET.get("q")
+        query_date_filter = datetime.strptime(query,"%Y-%m-%d")
+
+        montants = []
+        montant_resiliation = 0
+        montant_affaire = 0
+        montant_manuel = 0
+
+        user_id = [user.id for user in User.objects.all()]
+        
+        for name in user_id:
+            user = User.objects.get(id=name)
+            if user.groups.filter(name='Caissier'):
+                encaissement = manuel.objects.filter(user = name, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
+                aff = affaire.objects.filter(user = name, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
+                resil = resiliation.objects.filter(user = name, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
+
+                for manu in encaissement:
+                    montant_manuel += manu.montant
+                for cancel in resil:
+                    montant_resiliation += cancel.montant_a_payer
+                for case in aff:
+                    montant_affaire += case.montant
+                global_user = {
+                    'nom': user,
+                    'montant_manuel': montant_manuel,
+                    'montant_resiliation': montant_resiliation,
+                    'montant_affaire': montant_affaire
+                }
+
+                montants.append(global_user)
+                montant_manuel=0
+                montant_resiliation=0
+                montant_affaire=0
         context={
             'montants': montants,
         }
