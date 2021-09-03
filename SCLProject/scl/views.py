@@ -551,3 +551,35 @@ class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin')
+
+
+class UpdateResiliation(View):
+    def get(self,request,pk, *args, **kwargs):
+        resil = resiliation.objects.get(pk=pk)
+        if request.user.groups.filter(name='Admin'):
+            form=ResiliationForm(instance=resil)
+            return render(request, 'scl/update-resiliation.html', {'form':form})
+    def post(self, request, pk, *args, **kwargs):
+        newResiliation = resiliation.objects.get(pk=pk)
+        form = ResiliationForm(request.POST or None, instance = newResiliation)
+
+        if 'update' in request.POST:
+            if form.is_valid():
+                newResiliation = form.save()
+                newResiliation.redTableau = 429*newResiliation.nombre_mois
+                if newResiliation.nombre_mois>0:
+                    newResiliation.is_paid = True
+                    newResiliation.frais_coupure = 2000
+                    newResiliation.frais_retard = 500*newResiliation.nombre_mois
+                    newResiliation.tva = 0.18*(newResiliation.redTableau+newResiliation.frais_coupure)
+                    newResiliation.montant_ttc = newResiliation.redTableau + newResiliation.frais_coupure + newResiliation.frais_retard + newResiliation.tva
+                    if newResiliation.montant_ttc > 20000:
+                        newResiliation.timbre = 0.01*newResiliation.montant_ttc
+                    else:
+                        newResiliation.timbre = 0
+                    newResiliation.montant_a_payer = newResiliation.montant_ttc + newResiliation.timbre
+                newResiliation.save()
+        elif 'delete' in request.POST:
+            newResiliation.delete()
+        
+        return redirect('resiliationDashboard')

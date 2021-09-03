@@ -16,6 +16,7 @@ urlpatterns = [
 
     path('dashboard', Dashboard.as_view(), name='dashboard'),
     path('dashboard/search', SearchDashboard.as_view(), name='dashboard-search' ),
+    path('update/<int:pk>', UpdateResiliation.as_view(), name='update-resiliation' ),
     
 
 
