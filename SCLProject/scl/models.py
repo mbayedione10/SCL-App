@@ -56,7 +56,7 @@ class affaire(models.Model):
 class manuel(models.Model):
     motif_reglement = models.CharField(max_length=50,null=False)
     contrat = models.CharField(null=True,blank=True, max_length=25)
-    mode_payement = models.CharField(choices=PAYMENT_MODE,max_length=30, null=True, blank=True)
+    mode_payement = models.CharField(choices=PAYMENT_MODE,max_length=30, null=False, default=espece)
     village = models.CharField(max_length=50, blank=True)
     montant = models.IntegerField(null=False)
     user = models.ManyToManyField(User)
