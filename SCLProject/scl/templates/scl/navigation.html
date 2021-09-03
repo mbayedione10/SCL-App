@@ -27,8 +27,6 @@
                   <div class="dropdown-divider"></div>
                   {% if request.user.groups.all.0.name == "Admin" %}
                   <a class="dropdown-item" href="{% url 'dashboard' %}">General</a>
-                  {% else %}
-                  <a class="dropdown-item disabled" href="{% url 'dashboard' %}">General</a>
                   {% endif %}
 
                 </div>
