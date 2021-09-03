@@ -1,5 +1,4 @@
-from datetime import date, datetime, tzinfo
-from typing import ContextManager
+from datetime import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
@@ -49,7 +48,6 @@ class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 
-
 class AjouterResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, *args, **kwargs):
         form = ResiliationForm
@@ -81,10 +79,14 @@ class AjouterResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
                 list_id.append(user_id)
                 newResiliation.user.add(*list_id)
                 newResiliation.save()
-        
-        return redirect('index')
 
-    
+                return redirect('index')
+            else:
+                form = ResiliationForm
+                context = {
+                        'form': form,
+                    }
+                return render(request,'scl/resiliation.html', context)
 
     def test_func(self):
         return self.request.user.groups.all()
@@ -131,7 +133,7 @@ class ResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
         user_id = request.user.id
         
         if request.user.groups.filter(name='Caissier'):
-            resil = resiliation.objects.filter(user = user_id)
+            resil = resiliation.objects.filter(user = user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
             for name in resil:
                 added_by = [user.username for user in User.objects.filter(resiliation=name)]
                 montantTotal += name.montant_a_payer
@@ -247,7 +249,7 @@ class AffaireDashboard(View):
         user_id = request.user.id
 
         if request.user.groups.filter(name='Caissier'):
-            aff= affaire.objects.filter(user=user_id)
+            aff= affaire.objects.filter(user=user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
             for case in aff:
                 montantTotal += case.montant
                 nombreAffaire += 1
@@ -285,6 +287,9 @@ class AffaireDashboard(View):
         }
         
         return render(request,'scl/affaireDashboard.html', context)
+    
+    def test_func(self):
+        return self.request.user.groups.all()
 
 class SearchAffaireDashboard(View):
     def get(self, request, *args, **kwargs):
@@ -336,6 +341,9 @@ class SearchAffaireDashboard(View):
         }
         
         return render(request,'scl/affaireDashboard.html', context)
+    
+    def test_func(self):
+        return self.request.user.groups.all()
 
 class ManuelDashboard(View):
     def get(self, request, *args, **kwargs):
@@ -345,7 +353,7 @@ class ManuelDashboard(View):
         all_manuel = []
         user_id = request.user.id
         if request.user.groups.filter(name='Caissier'):
-            encaissement = manuel.objects.filter(user = user_id)
+            encaissement = manuel.objects.filter(user = user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
             for manu in encaissement:
                 added_by = [user.username for user in User.objects.filter(manuel = manu) ]
                 nombreManuel +=1
@@ -384,6 +392,9 @@ class ManuelDashboard(View):
             'montant_total': montantTotal
         }
         return render(request, 'scl/manuelDashboard.html', context)
+
+    def test_func(self):
+        return self.request.user.groups.all()
 
 
 class SearchManuelDashboard(View):
@@ -437,8 +448,11 @@ class SearchManuelDashboard(View):
         }
         return render(request, 'scl/manuelDashboard.html', context)
 
+    def test_func(self):
+        return self.request.user.groups.all()
 
-class Dashboard(View):
+
+class Dashboard(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, *args, **kwargs):
         montants = []
         montant_resiliation = 0
@@ -446,35 +460,37 @@ class Dashboard(View):
         montant_manuel = 0
 
         user_id = [user.id for user in User.objects.all()]
-        user =[user.username for user in User.objects.all()]
-
         
         for name in user_id:
-            added_by = [user.username for user in User.objects.filter(id = name)]
-            encaissement = manuel.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-            aff = affaire.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-            resil = resiliation.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-            print(added_by)
-            for manu in encaissement:
-                montant_manuel += manu.montant
-            for cancel in resil:
-                montant_resiliation += cancel.montant_a_payer
-            for case in aff:
-                montant_affaire += case.montant
-            global_user = {
-                'nom': added_by[0],
-                'montant_manuel': montant_manuel,
-                'montant_resiliation': montant_resiliation,
-                'montant_affaire': montant_affaire
-            }
+            user = User.objects.get(id=name)
+            if user.groups.filter(name='Caissier'):
+                encaissement = manuel.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+                aff = affaire.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+                resil = resiliation.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
 
-            montants.append(global_user)
-            montant_manuel=0
-            montant_resiliation=0
-            montant_affaire=0
-            print(montants)
+                for manu in encaissement:
+                    montant_manuel += manu.montant
+                for cancel in resil:
+                    montant_resiliation += cancel.montant_a_payer
+                for case in aff:
+                    montant_affaire += case.montant
+                global_user = {
+                    'nom': user,
+                    'montant_manuel': montant_manuel,
+                    'montant_resiliation': montant_resiliation,
+                    'montant_affaire': montant_affaire
+                }
+
+                montants.append(global_user)
+                montant_manuel=0
+                montant_resiliation=0
+                montant_affaire=0
+                print(montants)
         context={
             'montants': montants,
         }
 
         return render (request, 'scl/dashboard.html', context)
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin')

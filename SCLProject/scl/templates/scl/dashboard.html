@@ -28,21 +28,26 @@
                     
                     <tr>
                         <th scope="row">Résiliation</th>
+                        {% for global in montants %}
+                        <td>{{ global.montant_resiliation }}</td>
+                        {% endfor %}
                     </tr>
                     <tr>
                         <th scope="row">Affaire</th>
+                        {% for global in montants %}
+                        <td>{{ global.montant_affaire }}</td>
+                        {% endfor %}
                     </tr>
                     <tr>
                         <th scope="row">Manuel</th>
+                        {% for global in montants %}
+                        <td>{{ global.montant_manuel }}</td>
+                        {% endfor %}
                     </tr>
 
 
                     <tr>
-                        {% for global in montants %}
-                        <th>{{ global.montant_resiliation }}</th>
-                        <th>{{ global.montant_affaire }}</th>
-                        <th>{{ global.montant_manuel }}</th>
-                        {% endfor %}
+
                     </tr>
                                             
                    
