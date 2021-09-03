@@ -41,7 +41,13 @@ class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
 
                 newManuel.save()
 
-        return redirect('index')
+                return redirect('index')
+            else:
+                form = ManuelForm()
+                context = {
+                    'form': form,
+                }
+                return render(request, 'scl/manuel.html', context)
     
     def test_func(self):
         return self.request.user.groups.all()
@@ -115,9 +121,16 @@ class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
                 newAffaire.user.add(*list_id)
 
                 newAffaire.save()
+                return redirect('index')
+            else:
+                form = AffaireForm
+                context = {
+                    'form': form,
+                    }
+                return render(request,'scl/affaire.html', context)
                 
 
-        return redirect('index')
+        
     
     def test_func(self):
         return self.request.user.groups.all()
@@ -279,7 +292,7 @@ class AffaireDashboard(View):
                     'montant': case.montant,
                 }
                 all_affaire.append(affaire_data)
-
+        all_affaire.sort(key=lambda item:item['date_ajout'], reverse=True)
         context = {
             'montant_total': montantTotal,
             'affaire': all_affaire,
@@ -333,7 +346,7 @@ class SearchAffaireDashboard(View):
                     'montant': case.montant,
                 }
                 all_affaire.append(affaire_data)
-
+        all_affaire.sort(key=lambda item:item['date_ajout'], reverse=True)
         context = {
             'montant_total': montantTotal,
             'affaire': all_affaire,
@@ -385,7 +398,7 @@ class ManuelDashboard(View):
                     'caissier': added_by[0]
                     }
                 all_manuel.append(manuel_data)
-            
+        all_manuel.sort(key=lambda item:item['date_ajout'], reverse=True)
         context={
             'manuel': all_manuel,
             'nombre_manuel': nombreManuel,
@@ -440,7 +453,7 @@ class SearchManuelDashboard(View):
                     'caissier': added_by[0]
                     }
                 all_manuel.append(manuel_data)
-            
+        all_manuel.sort(key=lambda item:item['date_ajout'], reverse=True)
         context={
             'manuel': all_manuel,
             'nombre_manuel': nombreManuel,
