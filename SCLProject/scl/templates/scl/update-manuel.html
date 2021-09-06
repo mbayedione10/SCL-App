@@ -1,0 +1,66 @@
+{% extends 'scl/base.html' %}
+{% load static %}
+{% block content %}
+{% load crispy_forms_tags %}
+<section>
+    <div class="container mb-5">
+        <div class="row justify-content-center mt-1">
+            <div class="col-md-12 col-sm-12 p-4 font-weight-bold blue-text">
+                <form action="#" method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="form-group col-md-4 col-sm-12">
+                            {{ form.contrat|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-4 col-sm-12">
+                            {{ form.nom_client|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-4 col-sm-12">
+                            {{ form.contact_client|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6 col-sm-12">
+                            {{ form.motif_reglement|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12">
+                            {{ form.village|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6 col-sm-12">
+                            {{ form.mode_payement|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12">
+                            {{ form.montant|as_crispy_field}}
+                        </div>
+                    </div>
+
+                    <!--Button trigger modal-->
+                    <button type="submit" class="btn btn-blue" name="update">Modifier</button>
+                    <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#submitModal">Supprimer</button>
+
+                    <!--Modal-->
+                    <div class="modal fade" id="submitModal" tabindex="-1" aria-labelledby="submitModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="submitModalLabel">Suppression</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="text-center">Confirmez-vous la suppression?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-dismiss="modal">Retour</button>
+                                    <button type="submit" name="save" class="btn btn-danger">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+  {% endblock content %} 

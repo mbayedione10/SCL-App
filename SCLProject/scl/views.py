@@ -612,3 +612,17 @@ class UpdateAffaire(LoginRequiredMixin,UserPassesTestMixin,View):
             
     def test_func(self):
         return self.request.user.groups.filter(name='Admin')
+
+class UpdateManuel(LoginRequiredMixin, UserPassesTestMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        manu = manuel.objects.get(pk=pk)
+        form = ManuelForm(instance=manu)
+        context={
+            'form':form,
+        }
+        return render(request, 'scl/update-manuel.html', context)
+
+
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin')
