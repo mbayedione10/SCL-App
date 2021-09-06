@@ -626,3 +626,16 @@ class UpdateManuel(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin')
+
+
+    def post(self, request,pk,*args,**kwargs):
+        newManuel = manuel.objects.get(pk=pk)
+        form = ManuelForm(request.POST or None,instance=newManuel)
+        if 'update' in request.POST:
+            if form.is_valid():
+                newManuel.save()
+        
+        elif 'delete' in request.POST:
+            newManuel.delete()
+
+        return redirect('manuelDashboard')
