@@ -553,7 +553,7 @@ class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
         return self.request.user.groups.filter(name='Admin')
 
 
-class UpdateResiliation(View):
+class UpdateResiliation(LoginRequiredMixin,UserPassesTestMixin,View):
     def get(self,request,pk, *args, **kwargs):
         resil = resiliation.objects.get(pk=pk)
         if request.user.groups.filter(name='Admin'):
@@ -583,3 +583,32 @@ class UpdateResiliation(View):
             newResiliation.delete()
         
         return redirect('resiliationDashboard')
+
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin')
+
+class UpdateAffaire(LoginRequiredMixin,UserPassesTestMixin,View):
+    def get(self, request,pk, *args, **kwargs):
+        aff = affaire.objects.get(pk=pk)
+        form = AffaireForm(instance=aff)
+        context={
+            'form':form
+        }
+        return render(request, 'scl/update-affaire.html', context)
+
+    def post(self, request,pk,*args,**kwargs):
+        newAffaire = affaire.objects.get(pk=pk)
+        form = AffaireForm(request.POST or None, instance=newAffaire)
+        if 'update' in request.POST:
+
+            if form.is_valid():
+                #Save form and add user and date
+                newAffaire.save()
+        elif 'delete' in request.POST:
+            newAffaire.delete()
+
+        return redirect('affaireDashboard')
+            
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin')
