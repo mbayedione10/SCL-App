@@ -194,6 +194,115 @@ class ResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
         return self.request.user.groups.all()
 
 
+
+
+class AffaireDashboard(View):
+    def get(self, request, *args, **kwargs):
+        aff = affaire.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+        nombreAffaire = 0
+        montantTotal = 0
+        all_affaire = []
+        user_id = request.user.id
+
+        if request.user.groups.filter(name='Caissier'):
+            aff= affaire.objects.filter(user=user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+            for case in aff:
+                montantTotal += case.montant
+                nombreAffaire += 1
+                added_by = [user.username for user in User.objects.filter(affaire=case)]
+                affaire_data = {
+                    'caissier': added_by[0],
+                    'id_affaire': case.id,
+                    'date_ajout': case.date_ajout,
+                    'contrat': case.contrat,
+                    'libelle': case.libelle_affaire,
+                    'technicien': case.technicien,
+                    'montant': case.montant,
+                }
+                all_affaire.append(affaire_data)
+        else:
+            for case in aff:
+                montantTotal += case.montant
+                nombreAffaire += 1
+                added_by = [user.username for user in User.objects.filter(affaire=case)]
+                affaire_data = {
+                    'caissier': added_by[0],
+                    'id_affaire': case.id,
+                    'date_ajout': case.date_ajout,
+                    'contrat': case.contrat,
+                    'libelle': case.libelle_affaire,
+                    'technicien': case.technicien,
+                    'montant': case.montant,
+                }
+                all_affaire.append(affaire_data)
+        all_affaire.sort(key=lambda item:item['date_ajout'], reverse=True)
+        context = {
+            'montant_total': montantTotal,
+            'affaire': all_affaire,
+            'nombre_affaire': nombreAffaire
+        }
+        
+        return render(request,'scl/affaireDashboard.html', context)
+    
+    def test_func(self):
+        return self.request.user.groups.all()
+
+
+
+class ManuelDashboard(View):
+    def get(self, request, *args, **kwargs):
+        encaissement = manuel.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+        nombreManuel = 0
+        montantTotal = 0
+        all_manuel = []
+        user_id = request.user.id
+        if request.user.groups.filter(name='Caissier'):
+            encaissement = manuel.objects.filter(user = user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+            for manu in encaissement:
+                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
+                nombreManuel +=1
+                montantTotal += manu.montant
+                manuel_data = {
+                    'id_manuel': manu.id,
+                    'date_ajout': manu.date_ajout,
+                    'contrat': manu.contrat,
+                    'nom_client': manu.nom_client,
+                    'motif_reglement': manu.motif_reglement,
+                    'mode_payement': manu.mode_payement,
+                    'montant': manu.montant,
+                    'caissier': added_by[0]
+                }
+                all_manuel.append(manuel_data)
+        else:
+            for manu in encaissement:
+                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
+                nombreManuel +=1
+                montantTotal += manu.montant
+                manuel_data = {
+                    'id_manuel': manu.id,
+                    'date_ajout': manu.date_ajout,
+                    'contrat': manu.contrat,
+                    'nom_client': manu.nom_client,
+                    'motif_reglement': manu.motif_reglement,
+                    'mode_payement': manu.mode_payement,
+                    'montant': manu.montant,
+                    'caissier': added_by[0]
+                    }
+                all_manuel.append(manuel_data)
+        all_manuel.sort(key=lambda item:item['date_ajout'], reverse=True)
+        context={
+            'manuel': all_manuel,
+            'nombre_manuel': nombreManuel,
+            'montant_total': montantTotal
+        }
+        return render(request, 'scl/manuelDashboard.html', context)
+
+    def test_func(self):
+        return self.request.user.groups.all()
+
+
+
+
 class SearchResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         query = self.request.GET.get("q")
@@ -253,56 +362,8 @@ class SearchResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
     def test_func(self):
         return self.request.user.groups.all()
 
-class AffaireDashboard(View):
-    def get(self, request, *args, **kwargs):
-        aff = affaire.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-        nombreAffaire = 0
-        montantTotal = 0
-        all_affaire = []
-        user_id = request.user.id
 
-        if request.user.groups.filter(name='Caissier'):
-            aff= affaire.objects.filter(user=user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-            for case in aff:
-                montantTotal += case.montant
-                nombreAffaire += 1
-                added_by = [user.username for user in User.objects.filter(affaire=case)]
-                affaire_data = {
-                    'caissier': added_by[0],
-                    'id_affaire': case.id,
-                    'date_ajout': case.date_ajout,
-                    'contrat': case.contrat,
-                    'libelle': case.libelle_affaire,
-                    'technicien': case.technicien,
-                    'montant': case.montant,
-                }
-                all_affaire.append(affaire_data)
-        else:
-            for case in aff:
-                montantTotal += case.montant
-                nombreAffaire += 1
-                added_by = [user.username for user in User.objects.filter(affaire=case)]
-                affaire_data = {
-                    'caissier': added_by[0],
-                    'id_affaire': case.id,
-                    'date_ajout': case.date_ajout,
-                    'contrat': case.contrat,
-                    'libelle': case.libelle_affaire,
-                    'technicien': case.technicien,
-                    'montant': case.montant,
-                }
-                all_affaire.append(affaire_data)
-        all_affaire.sort(key=lambda item:item['date_ajout'], reverse=True)
-        context = {
-            'montant_total': montantTotal,
-            'affaire': all_affaire,
-            'nombre_affaire': nombreAffaire
-        }
-        
-        return render(request,'scl/affaireDashboard.html', context)
-    
-    def test_func(self):
-        return self.request.user.groups.all()
+
 
 class SearchAffaireDashboard(View):
     def get(self, request, *args, **kwargs):
@@ -355,57 +416,6 @@ class SearchAffaireDashboard(View):
         
         return render(request,'scl/affaireDashboard.html', context)
     
-    def test_func(self):
-        return self.request.user.groups.all()
-
-class ManuelDashboard(View):
-    def get(self, request, *args, **kwargs):
-        encaissement = manuel.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-        nombreManuel = 0
-        montantTotal = 0
-        all_manuel = []
-        user_id = request.user.id
-        if request.user.groups.filter(name='Caissier'):
-            encaissement = manuel.objects.filter(user = user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-            for manu in encaissement:
-                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
-                nombreManuel +=1
-                montantTotal += manu.montant
-                manuel_data = {
-                    'id_manuel': manu.id,
-                    'date_ajout': manu.date_ajout,
-                    'contrat': manu.contrat,
-                    'nom_client': manu.nom_client,
-                    'motif_reglement': manu.motif_reglement,
-                    'mode_payement': manu.mode_payement,
-                    'montant': manu.montant,
-                    'caissier': added_by[0]
-                }
-                all_manuel.append(manuel_data)
-        else:
-            for manu in encaissement:
-                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
-                nombreManuel +=1
-                montantTotal += manu.montant
-                manuel_data = {
-                    'id_manuel': manu.id,
-                    'date_ajout': manu.date_ajout,
-                    'contrat': manu.contrat,
-                    'nom_client': manu.nom_client,
-                    'motif_reglement': manu.motif_reglement,
-                    'mode_payement': manu.mode_payement,
-                    'montant': manu.montant,
-                    'caissier': added_by[0]
-                    }
-                all_manuel.append(manuel_data)
-        all_manuel.sort(key=lambda item:item['date_ajout'], reverse=True)
-        context={
-            'manuel': all_manuel,
-            'nombre_manuel': nombreManuel,
-            'montant_total': montantTotal
-        }
-        return render(request, 'scl/manuelDashboard.html', context)
-
     def test_func(self):
         return self.request.user.groups.all()
 
@@ -507,6 +517,8 @@ class Dashboard(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
         return self.request.user.groups.filter(name='Admin')
 
+
+
 class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, *args, **kwargs):
         query = self.request.GET.get("q")
@@ -551,6 +563,7 @@ class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def test_func(self):
         return self.request.user.groups.filter(name='Admin')
+
 
 
 class UpdateResiliation(LoginRequiredMixin,UserPassesTestMixin,View):
@@ -623,11 +636,6 @@ class UpdateManuel(LoginRequiredMixin, UserPassesTestMixin, View):
         return render(request, 'scl/update-manuel.html', context)
 
 
-
-    def test_func(self):
-        return self.request.user.groups.filter(name='Admin')
-
-
     def post(self, request,pk,*args,**kwargs):
         newManuel = manuel.objects.get(pk=pk)
         form = ManuelForm(request.POST or None,instance=newManuel)
@@ -639,3 +647,8 @@ class UpdateManuel(LoginRequiredMixin, UserPassesTestMixin, View):
             newManuel.delete()
 
         return redirect('manuelDashboard')
+
+    
+    def test_func(self):
+        return self.request.user.groups.filter(name='Admin')
+
