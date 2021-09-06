@@ -34,7 +34,9 @@
                         <th scope="col">Libelle Affaire</th>
                         <th scope="col">Technicien</th>
                         <th scope="col">Montant</th>
+                        {% if request.user.groups.all.0.name == "Admin" %}
                         <th colspan="2">Edit</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
