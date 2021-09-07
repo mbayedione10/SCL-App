@@ -1,5 +1,4 @@
 from django.urls import path
-from django.conf.urls.static import static
 from .views import *
 
 urlpatterns = [
@@ -27,10 +26,4 @@ urlpatterns = [
     path('dashboard', Dashboard.as_view(), name='dashboard'),
     path('dashboard/search', SearchDashboard.as_view(), name='dashboard-search' ),
 
-
-
-    
-
-
 ]
-#urlpatterns += static(se)
