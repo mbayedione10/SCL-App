@@ -9,7 +9,13 @@ from django.utils import timezone
 from django.db.models import Q
 
 
-class Index(LoginRequiredMixin, UserPassesTestMixin,View):
+# LoginRequiredMixin: will just make sure the user in the request is logged in
+# UserPassesTestMixin: will check the request from a boolean expression we define
+
+
+class Index(LoginRequiredMixin, UserPassesTestMixin, View):
+    """GET request to render the HTML template index"""
+
     def get(self, request):
         return render(request, 'scl/index.html')
 
@@ -18,28 +24,41 @@ class Index(LoginRequiredMixin, UserPassesTestMixin,View):
 
 
 class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
+        """
+        Form for manual operations
+        :param request: GET
+        :return: manuel.html
+        """
         form = ManuelForm()
         context = {
             'form': form,
         }
         return render(request, 'scl/manuel.html', context)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
+        """
+        :param request: POST
+        if POST done
+            :return: index.html
+        else
+            :return: manuel.html
+
+        """
         form = ManuelForm(request.POST)
 
         if 'save' in request.POST:
             if form.is_valid():
                 # Add manuel and excluded fields in form
-                newManuel = form.save()
+                new_manuel = form.save()
 
-                newManuel.date_ajout = timezone.datetime.now(tz=timezone.utc)
-                list_id=[]
+                new_manuel.date_ajout = timezone.datetime.now(tz=timezone.utc)
+                list_id = []
                 user_id = request.user.id
                 list_id.append(user_id)
-                newManuel.user.add(*list_id)
+                new_manuel.user.add(*list_id)
 
-                newManuel.save()
+                new_manuel.save()
 
                 return redirect('index')
             else:
@@ -48,109 +67,155 @@ class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
                     'form': form,
                 }
                 return render(request, 'scl/manuel.html', context)
-    
+
     def test_func(self):
+        """
+        Check if request.user is in a group
+        :return: True or False
+        """
         return self.request.user.groups.all()
 
 
-
 class AjouterResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
+        """
+        Form for Cancel operations
+        :param request: GET
+        :return: resiliation.html
+        """
         form = ResiliationForm
         context = {
             'form': form,
         }
-        return render(request,'scl/resiliation.html', context)
-    
-    def post(self, request, *args, **kwargs):
+        return render(request, 'scl/resiliation.html', context)
+
+    def post(self, request):
+        """
+        if form is valid, calculate other fields based on the number of months entered by operator
+        :param request: POST
+        if POST done
+            :return: index.html
+        else
+            :return: resiliation.html
+
+        """
         form = ResiliationForm(request.POST)
         if 'save' in request.POST:
             if form.is_valid():
-                newResiliation = form.save()
-                newResiliation.redTableau = 429*newResiliation.nombre_mois
-                if newResiliation.nombre_mois>0:
-                    newResiliation.is_paid = True
-                    newResiliation.frais_coupure = 2000
-                    newResiliation.frais_retard = 500*newResiliation.nombre_mois
-                    newResiliation.tva = 0.18*(newResiliation.redTableau+newResiliation.frais_coupure)
-                    newResiliation.montant_ttc = newResiliation.redTableau + newResiliation.frais_coupure + newResiliation.frais_retard + newResiliation.tva
-                    if newResiliation.montant_ttc > 20000:
-                        newResiliation.timbre = 0.01*newResiliation.montant_ttc
+                new_resiliation = form.save()
+                new_resiliation.redTableau = 429 * new_resiliation.nombre_mois
+                if new_resiliation.nombre_mois > 0:
+                    new_resiliation.is_paid = True
+                    new_resiliation.frais_coupure = 2000
+                    new_resiliation.frais_retard = 500 * new_resiliation.nombre_mois
+                    new_resiliation.tva = 0.18 * (new_resiliation.redTableau + new_resiliation.frais_coupure)
+                    new_resiliation.montant_ttc = new_resiliation.redTableau + new_resiliation.frais_coupure + new_resiliation.frais_retard + new_resiliation.tva
+                    if new_resiliation.montant_ttc > 20000:
+                        new_resiliation.timbre = 0.01 * new_resiliation.montant_ttc
                     else:
-                        newResiliation.timbre = 0
-                    newResiliation.montant_a_payer = newResiliation.montant_ttc + newResiliation.timbre
-                newResiliation.date_ajout = timezone.datetime.now(tz=timezone.utc)
+                        new_resiliation.timbre = 0
+                    new_resiliation.montant_a_payer = new_resiliation.montant_ttc + new_resiliation.timbre
+                new_resiliation.date_ajout = timezone.datetime.now(tz=timezone.utc)
                 list_id = []
                 user_id = request.user.id
                 list_id.append(user_id)
-                newResiliation.user.add(*list_id)
-                newResiliation.save()
+                new_resiliation.user.add(*list_id)
+                new_resiliation.save()
 
                 return redirect('index')
             else:
                 form = ResiliationForm
                 context = {
-                        'form': form,
-                    }
-                return render(request,'scl/resiliation.html', context)
+                    'form': form,
+                }
+                return render(request, 'scl/resiliation.html', context)
 
     def test_func(self):
+        """
+        Check if request.user is in a group
+        :return: True or False
+        """
         return self.request.user.groups.all()
 
 
 class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
+        """
+        Form for 'Affaires' operations
+        :param request: GET
+        :return: affaire.html
+        """
         form = AffaireForm
-        context={
+        context = {
             'form': form
         }
-        return render(request,'scl/affaire.html',context)
+        return render(request, 'scl/affaire.html', context)
 
-    
-    def post(self,request, *args, **kwargs):
+    def post(self, request):
+        """
+        if form is valid, add fields excluded in AffaireForm
+        :param request: POST
+        if POST done
+            :return: index.html
+        else
+            :return: affaire.html
+
+        """
         form = AffaireForm(request.POST)
         if 'save' in request.POST:
 
             if form.is_valid():
-                #Save form and add user and date
-                newAffaire =form.save()
-                newAffaire.date_ajout= timezone.datetime.now(tz=timezone.utc)
+                # Save form and add user and date
+                new_affaire = form.save()
+                new_affaire.date_ajout = timezone.datetime.now(tz=timezone.utc)
                 list_id = []
-                user_id= request.user.id
+                user_id = request.user.id
                 list_id.append(user_id)
-                newAffaire.user.add(*list_id)
+                new_affaire.user.add(*list_id)
 
-                newAffaire.save()
+                new_affaire.save()
                 return redirect('index')
             else:
                 form = AffaireForm
                 context = {
                     'form': form,
-                    }
-                return render(request,'scl/affaire.html', context)
-                
+                }
+                return render(request, 'scl/affaire.html', context)
 
-        
-    
     def test_func(self):
+        """
+        Check if request.user is in a group
+        :return: True or False
+        """
         return self.request.user.groups.all()
+
 
 # TODO PRINT only table with information
 today = datetime.today()
-class ResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        resil = resiliation.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-        nombreResiliation = 0
-        montantTotal = 0
+
+
+class ResiliationDashboard(UserPassesTestMixin, LoginRequiredMixin, View):
+    def get(self, request):
+        """
+        by default table of 'Resiliation' type operations done today
+        if request.user is a 'Caissier' show his own else show all
+        :param request: GET
+        :return: resiliationDashboard.html
+        """
+        resil = resiliation.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
+                                           date_ajout__day=today.day)
+        nombre_resiliation = 0
+        montant_total = 0
         all_resiliation = []
         user_id = request.user.id
-        
+
         if request.user.groups.filter(name='Caissier'):
-            resil = resiliation.objects.filter(user = user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+            resil = resiliation.objects.filter(user=user_id, date_ajout__year=today.year, date_ajout__month=today.month,
+                                               date_ajout__day=today.day)
             for name in resil:
                 added_by = [user.username for user in User.objects.filter(resiliation=name)]
-                montantTotal += name.montant_a_payer
-                nombreResiliation += 1
+                montant_total += name.montant_a_payer
+                nombre_resiliation += 1
                 resiliation_data = {
                     'id_resiliation': name.id,
                     'date_ajout': name.date_ajout,
@@ -165,8 +230,8 @@ class ResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
         else:
             for name in resil:
                 added_by = [user.username for user in User.objects.filter(resiliation=name)]
-                montantTotal += name.montant_a_payer
-                nombreResiliation += 1
+                montant_total += name.montant_a_payer
+                nombre_resiliation += 1
                 resiliation_data = {
                     'id_resiliation': name.id,
                     'date_ajout': name.date_ajout,
@@ -179,36 +244,45 @@ class ResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
                 }
                 all_resiliation.append(resiliation_data)
 
-        
-        all_resiliation.sort(key=lambda item:item['date_ajout'], reverse=True)
+        all_resiliation.sort(key=lambda item: item['date_ajout'], reverse=True)
 
         context = {
             'resiliation': all_resiliation,
-            'nombre_resiliation': nombreResiliation,
-            'montant_total': montantTotal
+            'nombre_resiliation': nombre_resiliation,
+            'montant_total': montant_total
         }
 
-        return render(request,'scl/resiliationDashboard.html',context)
+        return render(request, 'scl/resiliationDashboard.html', context)
 
     def test_func(self):
+        """
+        Check if request.user is in a group
+        :return: True or False
+        """
         return self.request.user.groups.all()
 
 
-
-
 class AffaireDashboard(View):
-    def get(self, request, *args, **kwargs):
-        aff = affaire.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-        nombreAffaire = 0
-        montantTotal = 0
+    def get(self, request):
+        """
+        by default table of 'Affaires' type operations done today
+        if request.user is a 'Caissier' show his own else show all
+        :param request: GET
+        :return: affaireDashboard.html
+        """
+        aff = affaire.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
+                                     date_ajout__day=today.day)
+        nombre_affaire = 0
+        montant_total = 0
         all_affaire = []
         user_id = request.user.id
 
         if request.user.groups.filter(name='Caissier'):
-            aff= affaire.objects.filter(user=user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+            aff = affaire.objects.filter(user=user_id, date_ajout__year=today.year, date_ajout__month=today.month,
+                                         date_ajout__day=today.day)
             for case in aff:
-                montantTotal += case.montant
-                nombreAffaire += 1
+                montant_total += case.montant
+                nombre_affaire += 1
                 added_by = [user.username for user in User.objects.filter(affaire=case)]
                 affaire_data = {
                     'caissier': added_by[0],
@@ -222,8 +296,8 @@ class AffaireDashboard(View):
                 all_affaire.append(affaire_data)
         else:
             for case in aff:
-                montantTotal += case.montant
-                nombreAffaire += 1
+                montant_total += case.montant
+                nombre_affaire += 1
                 added_by = [user.username for user in User.objects.filter(affaire=case)]
                 affaire_data = {
                     'caissier': added_by[0],
@@ -235,33 +309,44 @@ class AffaireDashboard(View):
                     'montant': case.montant,
                 }
                 all_affaire.append(affaire_data)
-        all_affaire.sort(key=lambda item:item['date_ajout'], reverse=True)
+        all_affaire.sort(key=lambda item: item['date_ajout'], reverse=True)
         context = {
-            'montant_total': montantTotal,
+            'montant_total': montant_total,
             'affaire': all_affaire,
-            'nombre_affaire': nombreAffaire
+            'nombre_affaire': nombre_affaire
         }
-        
-        return render(request,'scl/affaireDashboard.html', context)
-    
+
+        return render(request, 'scl/affaireDashboard.html', context)
+
     def test_func(self):
+        """
+        Check if request.user is in a group
+        :return: True or False
+        """
         return self.request.user.groups.all()
 
 
-
 class ManuelDashboard(View):
-    def get(self, request, *args, **kwargs):
-        encaissement = manuel.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-        nombreManuel = 0
-        montantTotal = 0
+    def get(self, request):
+        """
+        by default table of 'Manuel' type operations done today
+        if request.user is a 'Caissier' show his own else show all
+        :param request: GET
+        :return: manuelDashboard.html
+        """
+        encaissement = manuel.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
+                                             date_ajout__day=today.day)
+        nombre_manuel = 0
+        montant_total = 0
         all_manuel = []
         user_id = request.user.id
         if request.user.groups.filter(name='Caissier'):
-            encaissement = manuel.objects.filter(user = user_id,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+            encaissement = manuel.objects.filter(user=user_id, date_ajout__year=today.year,
+                                                 date_ajout__month=today.month, date_ajout__day=today.day)
             for manu in encaissement:
-                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
-                nombreManuel +=1
-                montantTotal += manu.montant
+                added_by = [user.username for user in User.objects.filter(manuel=manu)]
+                nombre_manuel += 1
+                montant_total += manu.montant
                 manuel_data = {
                     'id_manuel': manu.id,
                     'date_ajout': manu.date_ajout,
@@ -275,9 +360,9 @@ class ManuelDashboard(View):
                 all_manuel.append(manuel_data)
         else:
             for manu in encaissement:
-                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
-                nombreManuel +=1
-                montantTotal += manu.montant
+                added_by = [user.username for user in User.objects.filter(manuel=manu)]
+                nombre_manuel += 1
+                montant_total += manu.montant
                 manuel_data = {
                     'id_manuel': manu.id,
                     'date_ajout': manu.date_ajout,
@@ -287,39 +372,50 @@ class ManuelDashboard(View):
                     'mode_payement': manu.mode_payement,
                     'montant': manu.montant,
                     'caissier': added_by[0]
-                    }
+                }
                 all_manuel.append(manuel_data)
-        all_manuel.sort(key=lambda item:item['date_ajout'], reverse=True)
-        context={
+        all_manuel.sort(key=lambda item: item['date_ajout'], reverse=True)
+        context = {
             'manuel': all_manuel,
-            'nombre_manuel': nombreManuel,
-            'montant_total': montantTotal
+            'nombre_manuel': nombre_manuel,
+            'montant_total': montant_total
         }
         return render(request, 'scl/manuelDashboard.html', context)
 
     def test_func(self):
+        """
+        Check if request.user is in a group
+        :return: True or False
+        """
         return self.request.user.groups.all()
 
 
-
-
-class SearchResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
+class SearchResiliationDashboard(UserPassesTestMixin, LoginRequiredMixin, View):
+    def get(self, request):
+        """
+        Table of 'Resiliation' type operations done daily
+        if request.user is a 'Caissier' show his own else show all
+        check if in the GET method there are "q" like q=yyyy-mm-dd
+        :param request: GET
+        :return: resiliationDashboard.html
+        """
         query = self.request.GET.get("q")
-        query_date_filter = datetime.strptime(query,"%Y-%m-%d")
+        query_date_filter = datetime.strptime(query, "%Y-%m-%d")
 
         resil = resiliation.objects.filter(Q(date_ajout__icontains=query))
-        nombreResiliation = 0
-        montantTotal = 0
+        nombre_resiliation = 0
+        montant_total = 0
         all_resiliation = []
         user_id = request.user.id
-        
+
         if request.user.groups.filter(name='Caissier'):
-            resil = resiliation.objects.filter(user = user_id, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
+            resil = resiliation.objects.filter(user=user_id, date_ajout__year=query_date_filter.year,
+                                               date_ajout__month=query_date_filter.month,
+                                               date_ajout__day=query_date_filter.day)
             for name in resil:
                 added_by = [user.username for user in User.objects.filter(resiliation=name)]
-                montantTotal += name.montant_a_payer
-                nombreResiliation += 1
+                montant_total += name.montant_a_payer
+                nombre_resiliation += 1
                 resiliation_data = {
                     'id_resiliation': name.id,
                     'date_ajout': name.date_ajout,
@@ -334,8 +430,8 @@ class SearchResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
         else:
             for name in resil:
                 added_by = [user.username for user in User.objects.filter(resiliation=name)]
-                montantTotal += name.montant_a_payer
-                nombreResiliation += 1
+                montant_total += name.montant_a_payer
+                nombre_resiliation += 1
                 resiliation_data = {
                     'id_resiliation': name.id,
                     'date_ajout': name.date_ajout,
@@ -348,39 +444,49 @@ class SearchResiliationDashboard(UserPassesTestMixin,LoginRequiredMixin, View):
                 }
                 all_resiliation.append(resiliation_data)
 
-        
-        all_resiliation.sort(key=lambda item:item['date_ajout'], reverse=True)
+        all_resiliation.sort(key=lambda item: item['date_ajout'], reverse=True)
 
         context = {
             'resiliation': all_resiliation,
-            'nombre_resiliation': nombreResiliation,
-            'montant_total': montantTotal
+            'nombre_resiliation': nombre_resiliation,
+            'montant_total': montant_total
         }
 
-        return render(request,'scl/resiliationDashboard.html',context)
+        return render(request, 'scl/resiliationDashboard.html', context)
 
     def test_func(self):
+        """
+        Check if request.user is in a group
+        :return: True or False
+        """
         return self.request.user.groups.all()
 
 
-
-
 class SearchAffaireDashboard(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
+        """
+        Table of 'Affaire' type operations done daily
+        if request.user is a 'Caissier' show his own else show all
+        check if in the GET method there are "q" like q=yyyy-mm-dd
+        :param request: GET
+        :return: affaireDashboard.html
+        """
         query = self.request.GET.get("q")
-        query_date_filter = datetime.strptime(query,"%Y-%m-%d")
+        query_date_filter = datetime.strptime(query, "%Y-%m-%d")
 
         aff = affaire.objects.filter(Q(date_ajout__icontains=query))
-        nombreAffaire = 0
-        montantTotal = 0
+        nombre_affaire = 0
+        montant_total = 0
         all_affaire = []
         user_id = request.user.id
 
         if request.user.groups.filter(name='Caissier'):
-            aff= affaire.objects.filter(user=user_id, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
+            aff = affaire.objects.filter(user=user_id, date_ajout__year=query_date_filter.year,
+                                         date_ajout__month=query_date_filter.month,
+                                         date_ajout__day=query_date_filter.day)
             for case in aff:
-                montantTotal += case.montant
-                nombreAffaire += 1
+                montant_total += case.montant
+                nombre_affaire += 1
                 added_by = [user.username for user in User.objects.filter(affaire=case)]
                 affaire_data = {
                     'caissier': added_by[0],
@@ -394,8 +500,8 @@ class SearchAffaireDashboard(View):
                 all_affaire.append(affaire_data)
         else:
             for case in aff:
-                montantTotal += case.montant
-                nombreAffaire += 1
+                montant_total += case.montant
+                nombre_affaire += 1
                 added_by = [user.username for user in User.objects.filter(affaire=case)]
                 affaire_data = {
                     'caissier': added_by[0],
@@ -407,35 +513,48 @@ class SearchAffaireDashboard(View):
                     'montant': case.montant,
                 }
                 all_affaire.append(affaire_data)
-        all_affaire.sort(key=lambda item:item['date_ajout'], reverse=True)
+        all_affaire.sort(key=lambda item: item['date_ajout'], reverse=True)
         context = {
-            'montant_total': montantTotal,
+            'montant_total': montant_total,
             'affaire': all_affaire,
-            'nombre_affaire': nombreAffaire
+            'nombre_affaire': nombre_affaire
         }
-        
-        return render(request,'scl/affaireDashboard.html', context)
-    
+
+        return render(request, 'scl/affaireDashboard.html', context)
+
     def test_func(self):
+        """
+        Check if request.user is in a group
+        :return: True or False
+        """
         return self.request.user.groups.all()
 
 
 class SearchManuelDashboard(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
+        """
+        Table of 'Manuel' type operations done daily
+        if request.user is a 'Caissier' show his own else show all
+        check if in the GET method there are "q" like q=yyyy-mm-dd
+        :param request: GET
+        :return: manuelDashboard.html
+        """
         query = self.request.GET.get("q")
-        query_date_filter = datetime.strptime(query,"%Y-%m-%d")
+        query_date_filter = datetime.strptime(query, "%Y-%m-%d")
 
         encaissement = manuel.objects.filter(Q(date_ajout__icontains=query))
-        nombreManuel = 0
-        montantTotal = 0
+        nombre_manuel = 0
+        montant_total = 0
         all_manuel = []
         user_id = request.user.id
         if request.user.groups.filter(name='Caissier'):
-            encaissement = manuel.objects.filter(user = user_id, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
+            encaissement = manuel.objects.filter(user=user_id, date_ajout__year=query_date_filter.year,
+                                                 date_ajout__month=query_date_filter.month,
+                                                 date_ajout__day=query_date_filter.day)
             for manu in encaissement:
-                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
-                nombreManuel +=1
-                montantTotal += manu.montant
+                added_by = [user.username for user in User.objects.filter(manuel=manu)]
+                nombre_manuel += 1
+                montant_total += manu.montant
                 manuel_data = {
                     'id_manuel': manu.id,
                     'date_ajout': manu.date_ajout,
@@ -449,9 +568,9 @@ class SearchManuelDashboard(View):
                 all_manuel.append(manuel_data)
         else:
             for manu in encaissement:
-                added_by = [user.username for user in User.objects.filter(manuel = manu) ]
-                nombreManuel +=1
-                montantTotal += manu.montant
+                added_by = [user.username for user in User.objects.filter(manuel=manu)]
+                nombre_manuel += 1
+                montant_total += manu.montant
                 manuel_data = {
                     'id_manuel': manu.id,
                     'date_ajout': manu.date_ajout,
@@ -461,35 +580,47 @@ class SearchManuelDashboard(View):
                     'mode_payement': manu.mode_payement,
                     'montant': manu.montant,
                     'caissier': added_by[0]
-                    }
+                }
                 all_manuel.append(manuel_data)
-        all_manuel.sort(key=lambda item:item['date_ajout'], reverse=True)
-        context={
+        all_manuel.sort(key=lambda item: item['date_ajout'], reverse=True)
+        context = {
             'manuel': all_manuel,
-            'nombre_manuel': nombreManuel,
-            'montant_total': montantTotal
+            'nombre_manuel': nombre_manuel,
+            'montant_total': montant_total
         }
         return render(request, 'scl/manuelDashboard.html', context)
 
     def test_func(self):
+        """
+        Check if request.user is in a group
+        :return: True or False
+        """
         return self.request.user.groups.all()
 
 
 class Dashboard(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
+        """
+        summarizes today's total amount of each operator with the different operations as a heading
+        :param request: GET
+        :return: dashboard.html
+        """
         montants = []
         montant_resiliation = 0
         montant_affaire = 0
         montant_manuel = 0
 
         user_id = [user.id for user in User.objects.all()]
-        
+
         for name in user_id:
             user = User.objects.get(id=name)
             if user.groups.filter(name='Caissier'):
-                encaissement = manuel.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-                aff = affaire.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
-                resil = resiliation.objects.filter(user = name,date_ajout__year=today.year, date_ajout__month=today.month, date_ajout__day=today.day)
+                encaissement = manuel.objects.filter(user=name, date_ajout__year=today.year,
+                                                     date_ajout__month=today.month, date_ajout__day=today.day)
+                aff = affaire.objects.filter(user=name, date_ajout__year=today.year, date_ajout__month=today.month,
+                                             date_ajout__day=today.day)
+                resil = resiliation.objects.filter(user=name, date_ajout__year=today.year,
+                                                   date_ajout__month=today.month, date_ajout__day=today.day)
 
                 for manu in encaissement:
                     montant_manuel += manu.montant
@@ -505,24 +636,33 @@ class Dashboard(LoginRequiredMixin, UserPassesTestMixin, View):
                 }
 
                 montants.append(global_user)
-                montant_manuel=0
-                montant_resiliation=0
-                montant_affaire=0
-        context={
+                montant_manuel = 0
+                montant_resiliation = 0
+                montant_affaire = 0
+        context = {
             'montants': montants,
         }
 
-        return render (request, 'scl/dashboard.html', context)
+        return render(request, 'scl/dashboard.html', context)
 
     def test_func(self):
+        """
+        Check if request.user is in Admin
+        :return: True or False
+        """
         return self.request.user.groups.filter(name='Admin')
-
 
 
 class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
+        """
+        summarizes the total daily amount of each operator with the different operations as a heading
+        check if in the GET method there are "q" like q=yyyy-mm-dd
+        :param request: GET
+        :return: dashboard.html
+        """
         query = self.request.GET.get("q")
-        query_date_filter = datetime.strptime(query,"%Y-%m-%d")
+        query_date_filter = datetime.strptime(query, "%Y-%m-%d")
 
         montants = []
         montant_resiliation = 0
@@ -530,13 +670,19 @@ class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
         montant_manuel = 0
 
         user_id = [user.id for user in User.objects.all()]
-        
+
         for name in user_id:
             user = User.objects.get(id=name)
             if user.groups.filter(name='Caissier'):
-                encaissement = manuel.objects.filter(user = name, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
-                aff = affaire.objects.filter(user = name, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
-                resil = resiliation.objects.filter(user = name, date_ajout__year = query_date_filter.year, date_ajout__month=query_date_filter.month, date_ajout__day=query_date_filter.day)
+                encaissement = manuel.objects.filter(user=name, date_ajout__year=query_date_filter.year,
+                                                     date_ajout__month=query_date_filter.month,
+                                                     date_ajout__day=query_date_filter.day)
+                aff = affaire.objects.filter(user=name, date_ajout__year=query_date_filter.year,
+                                             date_ajout__month=query_date_filter.month,
+                                             date_ajout__day=query_date_filter.day)
+                resil = resiliation.objects.filter(user=name, date_ajout__year=query_date_filter.year,
+                                                   date_ajout__month=query_date_filter.month,
+                                                   date_ajout__day=query_date_filter.day)
 
                 for manu in encaissement:
                     montant_manuel += manu.montant
@@ -552,103 +698,153 @@ class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
                 }
 
                 montants.append(global_user)
-                montant_manuel=0
-                montant_resiliation=0
-                montant_affaire=0
-        context={
+                montant_manuel = 0
+                montant_resiliation = 0
+                montant_affaire = 0
+        context = {
             'montants': montants,
         }
 
-        return render (request, 'scl/dashboard.html', context)
+        return render(request, 'scl/dashboard.html', context)
 
     def test_func(self):
+        """
+        Check if request.user is in 'Admin'
+        :return: True or False
+        """
         return self.request.user.groups.filter(name='Admin')
 
 
-
-class UpdateResiliation(LoginRequiredMixin,UserPassesTestMixin,View):
-    def get(self,request,pk, *args, **kwargs):
+class UpdateResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
+    def get(self, request, pk):
+        """
+        Retrieve information from an operation using its id
+        :param request: GET
+        :param pk: id_resiliation
+        :return: update-resiliation.html
+        """
         resil = resiliation.objects.get(pk=pk)
         if request.user.groups.filter(name='Admin'):
-            form=ResiliationForm(instance=resil)
-            return render(request, 'scl/update-resiliation.html', {'form':form})
-    def post(self, request, pk, *args, **kwargs):
-        newResiliation = resiliation.objects.get(pk=pk)
-        form = ResiliationForm(request.POST or None, instance = newResiliation)
+            form = ResiliationForm(instance=resil)
+            return render(request, 'scl/update-resiliation.html', {'form': form})
+
+    def post(self, request, pk):
+        """
+        check name in button update or delete operation by his id
+        :param request: POST
+        :param pk: id_resiliation
+        :return: redirect to resiliationDashboard.html
+        """
+        new_resiliation = resiliation.objects.get(pk=pk)
+        form = ResiliationForm(request.POST or None, instance=new_resiliation)
 
         if 'update' in request.POST:
             if form.is_valid():
-                newResiliation = form.save()
-                newResiliation.redTableau = 429*newResiliation.nombre_mois
-                if newResiliation.nombre_mois>0:
-                    newResiliation.is_paid = True
-                    newResiliation.frais_coupure = 2000
-                    newResiliation.frais_retard = 500*newResiliation.nombre_mois
-                    newResiliation.tva = 0.18*(newResiliation.redTableau+newResiliation.frais_coupure)
-                    newResiliation.montant_ttc = newResiliation.redTableau + newResiliation.frais_coupure + newResiliation.frais_retard + newResiliation.tva
-                    if newResiliation.montant_ttc > 20000:
-                        newResiliation.timbre = 0.01*newResiliation.montant_ttc
+                new_resiliation = form.save()
+                new_resiliation.redTableau = 429 * new_resiliation.nombre_mois
+                if new_resiliation.nombre_mois > 0:
+                    new_resiliation.is_paid = True
+                    new_resiliation.frais_coupure = 2000
+                    new_resiliation.frais_retard = 500 * new_resiliation.nombre_mois
+                    new_resiliation.tva = 0.18 * (new_resiliation.redTableau + new_resiliation.frais_coupure)
+                    new_resiliation.montant_ttc = new_resiliation.redTableau + new_resiliation.frais_coupure + \
+                                                  new_resiliation.frais_retard + new_resiliation.tva
+                    if new_resiliation.montant_ttc > 20000:
+                        new_resiliation.timbre = 0.01 * new_resiliation.montant_ttc
                     else:
-                        newResiliation.timbre = 0
-                    newResiliation.montant_a_payer = newResiliation.montant_ttc + newResiliation.timbre
-                newResiliation.save()
+                        new_resiliation.timbre = 0
+                    new_resiliation.montant_a_payer = new_resiliation.montant_ttc + new_resiliation.timbre
+                new_resiliation.save()
         elif 'delete' in request.POST:
-            newResiliation.delete()
-        
+            new_resiliation.delete()
+
         return redirect('resiliationDashboard')
 
-
     def test_func(self):
+        """
+        Check if request.user is in 'Admin'
+        :return: True or False
+        """
         return self.request.user.groups.filter(name='Admin')
 
-class UpdateAffaire(LoginRequiredMixin,UserPassesTestMixin,View):
-    def get(self, request,pk, *args, **kwargs):
+
+class UpdateAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
+    def get(self, request, pk):
+        """
+        Retrieve information from an operation using its id
+        :param request: GET
+        :param pk: id_affaire
+        :return: update-affaire.html
+        """
         aff = affaire.objects.get(pk=pk)
         form = AffaireForm(instance=aff)
-        context={
-            'form':form
+        context = {
+            'form': form
         }
         return render(request, 'scl/update-affaire.html', context)
 
-    def post(self, request,pk,*args,**kwargs):
-        newAffaire = affaire.objects.get(pk=pk)
-        form = AffaireForm(request.POST or None, instance=newAffaire)
+    def post(self, request, pk):
+        """
+        check name in button update or delete operation by his id
+        :param request: POST
+        :param pk: id_affaire
+        :return: redirect to affaireDashboard.html
+        """
+        new_affaire = affaire.objects.get(pk=pk)
+        form = AffaireForm(request.POST or None, instance=new_affaire)
         if 'update' in request.POST:
 
             if form.is_valid():
-                #Save form and add user and date
-                newAffaire.save()
+                new_affaire.save()
         elif 'delete' in request.POST:
-            newAffaire.delete()
+            new_affaire.delete()
 
         return redirect('affaireDashboard')
-            
+
     def test_func(self):
+        """
+        Check if request.user is in 'Admin'
+        :return: True or False
+        """
         return self.request.user.groups.filter(name='Admin')
 
+
 class UpdateManuel(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, pk):
+        """
+        Retrieve information from an operation using its id
+        :param request: GET
+        :param pk: id_manuel
+        :return: update-manuel.html
+        """
         manu = manuel.objects.get(pk=pk)
         form = ManuelForm(instance=manu)
-        context={
-            'form':form,
+        context = {
+            'form': form,
         }
         return render(request, 'scl/update-manuel.html', context)
 
-
-    def post(self, request,pk,*args,**kwargs):
-        newManuel = manuel.objects.get(pk=pk)
-        form = ManuelForm(request.POST or None,instance=newManuel)
+    def post(self, request, pk):
+        """
+        check name in button update or delete operation by his id
+        :param request: POST
+        :param pk: id_manuel
+        :return: redirect to manuelDashboard.html
+        """
+        new_manuel = manuel.objects.get(pk=pk)
+        form = ManuelForm(request.POST or None, instance=new_manuel)
         if 'update' in request.POST:
             if form.is_valid():
-                newManuel.save()
-        
+                new_manuel.save()
+
         elif 'delete' in request.POST:
-            newManuel.delete()
+            new_manuel.delete()
 
         return redirect('manuelDashboard')
 
-    
     def test_func(self):
+        """
+        Check if request.user is in 'Admin'
+        :return: True or False
+        """
         return self.request.user.groups.filter(name='Admin')
-
