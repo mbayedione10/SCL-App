@@ -15,7 +15,6 @@ Including another URLconf
 """
 #from os import name
 from django.contrib import admin
-from django.urls import path
 from django.urls import path, include
 from django.conf import settings
 from scl.views import Index
