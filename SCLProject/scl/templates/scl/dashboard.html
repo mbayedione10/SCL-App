@@ -4,7 +4,7 @@
 
     <div class="row mt-2 justify-content-end">
         <div class="col-md-3 col-sm-6">
-            <form method="GET" action="{% url 'dashboard-search' %}">
+            <form method="GET" action="{% url 'dashboard' %}">
             <div class="md-form mt-0 active-cyan-2">
                 <input type="date" name="q" class="form-control" aria-label="Search" required value="{{ request.GET.q }}">
                 <button type="submit" class="btn btn-blue" data-toggle="modal">Rechercher</button><a href="{% url 'dashboard' %}">Retour</a>

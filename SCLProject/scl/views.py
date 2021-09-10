@@ -193,203 +193,6 @@ class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
 # TODO PRINT only table with information
 today = datetime.today()
 
-
-class ResiliationDashboard(UserPassesTestMixin, LoginRequiredMixin, View):
-    def get(self, request):
-        """
-        by default table of 'Resiliation' type operations done today
-        if request.user is a 'Caissier' show his own else show all
-        :param request: GET
-        :return: resiliationDashboard.html
-        """
-        resil = resiliation.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
-                                           date_ajout__day=today.day)
-        nombre_resiliation = 0
-        montant_total = 0
-        all_resiliation = []
-        user_id = request.user.id
-
-        if request.user.groups.filter(name='Caissier'):
-            resil = resiliation.objects.filter(user=user_id, date_ajout__year=today.year, date_ajout__month=today.month,
-                                               date_ajout__day=today.day)
-            for name in resil:
-                added_by = [user.username for user in User.objects.filter(resiliation=name)]
-                montant_total += name.montant_a_payer
-                nombre_resiliation += 1
-                resiliation_data = {
-                    'id_resiliation': name.id,
-                    'date_ajout': name.date_ajout,
-                    'contrat': name.contrat,
-                    'montant_a_payer': name.montant_a_payer,
-                    'timbre': name.timbre,
-                    'montant_ttc': name.montant_ttc,
-                    'tva': name.tva,
-                    'caissier': added_by[0],
-                }
-                all_resiliation.append(resiliation_data)
-        else:
-            for name in resil:
-                added_by = [user.username for user in User.objects.filter(resiliation=name)]
-                montant_total += name.montant_a_payer
-                nombre_resiliation += 1
-                resiliation_data = {
-                    'id_resiliation': name.id,
-                    'date_ajout': name.date_ajout,
-                    'contrat': name.contrat,
-                    'montant_a_payer': name.montant_a_payer,
-                    'timbre': name.timbre,
-                    'montant_ttc': name.montant_ttc,
-                    'tva': name.tva,
-                    'caissier': added_by[0],
-                }
-                all_resiliation.append(resiliation_data)
-
-        all_resiliation.sort(key=lambda item: item['date_ajout'], reverse=True)
-
-        context = {
-            'resiliation': all_resiliation,
-            'nombre_resiliation': nombre_resiliation,
-            'montant_total': montant_total
-        }
-
-        return render(request, 'scl/resiliationDashboard.html', context)
-
-    def test_func(self):
-        """
-        Check if request.user is in a group
-        :return: True or False
-        """
-        return self.request.user.groups.all()
-
-
-class AffaireDashboard(View):
-    def get(self, request):
-        """
-        by default table of 'Affaires' type operations done today
-        if request.user is a 'Caissier' show his own else show all
-        :param request: GET
-        :return: affaireDashboard.html
-        """
-        aff = affaire.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
-                                     date_ajout__day=today.day)
-        nombre_affaire = 0
-        montant_total = 0
-        all_affaire = []
-        user_id = request.user.id
-
-        if request.user.groups.filter(name='Caissier'):
-            aff = affaire.objects.filter(user=user_id, date_ajout__year=today.year, date_ajout__month=today.month,
-                                         date_ajout__day=today.day)
-            for case in aff:
-                montant_total += case.montant
-                nombre_affaire += 1
-                added_by = [user.username for user in User.objects.filter(affaire=case)]
-                affaire_data = {
-                    'caissier': added_by[0],
-                    'id_affaire': case.id,
-                    'date_ajout': case.date_ajout,
-                    'contrat': case.contrat,
-                    'libelle': case.libelle_affaire,
-                    'technicien': case.technicien,
-                    'montant': case.montant,
-                }
-                all_affaire.append(affaire_data)
-        else:
-            for case in aff:
-                montant_total += case.montant
-                nombre_affaire += 1
-                added_by = [user.username for user in User.objects.filter(affaire=case)]
-                affaire_data = {
-                    'caissier': added_by[0],
-                    'id_affaire': case.id,
-                    'date_ajout': case.date_ajout,
-                    'contrat': case.contrat,
-                    'libelle': case.libelle_affaire,
-                    'technicien': case.technicien,
-                    'montant': case.montant,
-                }
-                all_affaire.append(affaire_data)
-        all_affaire.sort(key=lambda item: item['date_ajout'], reverse=True)
-        context = {
-            'montant_total': montant_total,
-            'affaire': all_affaire,
-            'nombre_affaire': nombre_affaire
-        }
-
-        return render(request, 'scl/affaireDashboard.html', context)
-
-    def test_func(self):
-        """
-        Check if request.user is in a group
-        :return: True or False
-        """
-        return self.request.user.groups.all()
-
-
-class ManuelDashboard(View):
-    def get(self, request):
-        """
-        by default table of 'Manuel' type operations done today
-        if request.user is a 'Caissier' show his own else show all
-        :param request: GET
-        :return: manuelDashboard.html
-        """
-        encaissement = manuel.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
-                                             date_ajout__day=today.day)
-        nombre_manuel = 0
-        montant_total = 0
-        all_manuel = []
-        user_id = request.user.id
-        if request.user.groups.filter(name='Caissier'):
-            encaissement = manuel.objects.filter(user=user_id, date_ajout__year=today.year,
-                                                 date_ajout__month=today.month, date_ajout__day=today.day)
-            for manu in encaissement:
-                added_by = [user.username for user in User.objects.filter(manuel=manu)]
-                nombre_manuel += 1
-                montant_total += manu.montant
-                manuel_data = {
-                    'id_manuel': manu.id,
-                    'date_ajout': manu.date_ajout,
-                    'contrat': manu.contrat,
-                    'nom_client': manu.nom_client,
-                    'motif_reglement': manu.motif_reglement,
-                    'mode_payement': manu.mode_payement,
-                    'montant': manu.montant,
-                    'caissier': added_by[0]
-                }
-                all_manuel.append(manuel_data)
-        else:
-            for manu in encaissement:
-                added_by = [user.username for user in User.objects.filter(manuel=manu)]
-                nombre_manuel += 1
-                montant_total += manu.montant
-                manuel_data = {
-                    'id_manuel': manu.id,
-                    'date_ajout': manu.date_ajout,
-                    'contrat': manu.contrat,
-                    'nom_client': manu.nom_client,
-                    'motif_reglement': manu.motif_reglement,
-                    'mode_payement': manu.mode_payement,
-                    'montant': manu.montant,
-                    'caissier': added_by[0]
-                }
-                all_manuel.append(manuel_data)
-        all_manuel.sort(key=lambda item: item['date_ajout'], reverse=True)
-        context = {
-            'manuel': all_manuel,
-            'nombre_manuel': nombre_manuel,
-            'montant_total': montant_total
-        }
-        return render(request, 'scl/manuelDashboard.html', context)
-
-    def test_func(self):
-        """
-        Check if request.user is in a group
-        :return: True or False
-        """
-        return self.request.user.groups.all()
-
-
 class SearchResiliationDashboard(UserPassesTestMixin, LoginRequiredMixin, View):
     def get(self, request):
         """
@@ -478,25 +281,37 @@ class SearchResiliationDashboard(UserPassesTestMixin, LoginRequiredMixin, View):
 class SearchAffaireDashboard(View):
     def get(self, request):
         """
-        Table of 'Affaire' type operations done daily
+        By defqult Table of 'Affaire' type operations done Today
         if request.user is a 'Caissier' show his own else show all
         check if in the GET method there are "q" like q=yyyy-mm-dd
         :param request: GET
         :return: affaireDashboard.html
         """
         query = self.request.GET.get("q")
-        query_date_filter = datetime.strptime(query, "%Y-%m-%d")
 
-        aff = affaire.objects.filter(Q(date_ajout__icontains=query))
+        if query is None:
+            aff = affaire.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
+                                            date_ajout__day=today.day)
+        else:
+            aff = affaire.objects.filter(Q(date_ajout__icontains=query))
+            
         nombre_affaire = 0
         montant_total = 0
         all_affaire = []
         user_id = request.user.id
 
         if request.user.groups.filter(name='Caissier'):
-            aff = affaire.objects.filter(user=user_id, date_ajout__year=query_date_filter.year,
-                                         date_ajout__month=query_date_filter.month,
-                                         date_ajout__day=query_date_filter.day)
+            if query is None:
+                aff = affaire.objects.filter(user=user_id,date_ajout__year=today.year, date_ajout__month=today.month,
+                                            date_ajout__day=today.day)
+            else:
+                query_date_filter = datetime.strptime(query, "%Y-%m-%d")
+                aff = affaire.objects.filter(
+                    Q(date_ajout__year=query_date_filter.year) &
+                    Q(date_ajout__month=query_date_filter.month) &
+                    Q(date_ajout__day=query_date_filter.day) &
+                    Q(user=user_id))
+
             for case in aff:
                 montant_total += case.montant
                 nombre_affaire += 1
@@ -546,24 +361,35 @@ class SearchAffaireDashboard(View):
 class SearchManuelDashboard(View):
     def get(self, request):
         """
-        Table of 'Manuel' type operations done daily
+        By default table of 'Manuel' type operations done Today
         if request.user is a 'Caissier' show his own else show all
         check if in the GET method there are "q" like q=yyyy-mm-dd
         :param request: GET
         :return: manuelDashboard.html
         """
         query = self.request.GET.get("q")
-        query_date_filter = datetime.strptime(query, "%Y-%m-%d")
+        if query is None:
+            encaissement = manuel.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
+                                            date_ajout__day=today.day)
+        else:
+            encaissement = manuel.objects.filter(Q(date_ajout__icontains=query))
 
-        encaissement = manuel.objects.filter(Q(date_ajout__icontains=query))
         nombre_manuel = 0
         montant_total = 0
         all_manuel = []
         user_id = request.user.id
         if request.user.groups.filter(name='Caissier'):
-            encaissement = manuel.objects.filter(user=user_id, date_ajout__year=query_date_filter.year,
-                                                 date_ajout__month=query_date_filter.month,
-                                                 date_ajout__day=query_date_filter.day)
+            if query is None:
+                encaissement = manuel.objects.filter(user=user_id,date_ajout__year=today.year, date_ajout__month=today.month,
+                                            date_ajout__day=today.day)
+            else:
+                query_date_filter = datetime.strptime(query, "%Y-%m-%d")
+                encaissement = manuel.objects.filter(
+                    Q(date_ajout__year=query_date_filter.year) &
+                    Q(date_ajout__month=query_date_filter.month) &
+                    Q(date_ajout__day=query_date_filter.day) &
+                    Q(user=user_id))
+
             for manu in encaissement:
                 added_by = [user.username for user in User.objects.filter(manuel=manu)]
                 nombre_manuel += 1
@@ -610,62 +436,6 @@ class SearchManuelDashboard(View):
         """
         return self.request.user.groups.all()
 
-
-class Dashboard(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request):
-        """
-        summarizes today's total amount of each operator with the different operations as a heading
-        :param request: GET
-        :return: dashboard.html
-        """
-        montants = []
-        montant_resiliation = 0
-        montant_affaire = 0
-        montant_manuel = 0
-
-        user_id = [user.id for user in User.objects.all()]
-
-        for name in user_id:
-            user = User.objects.get(id=name)
-            if user.groups.filter(name='Caissier'):
-                encaissement = manuel.objects.filter(user=name, date_ajout__year=today.year,
-                                                     date_ajout__month=today.month, date_ajout__day=today.day)
-                aff = affaire.objects.filter(user=name, date_ajout__year=today.year, date_ajout__month=today.month,
-                                             date_ajout__day=today.day)
-                resil = resiliation.objects.filter(user=name, date_ajout__year=today.year,
-                                                   date_ajout__month=today.month, date_ajout__day=today.day)
-
-                for manu in encaissement:
-                    montant_manuel += manu.montant
-                for cancel in resil:
-                    montant_resiliation += cancel.montant_a_payer
-                for case in aff:
-                    montant_affaire += case.montant
-                global_user = {
-                    'nom': user,
-                    'montant_manuel': montant_manuel,
-                    'montant_resiliation': montant_resiliation,
-                    'montant_affaire': montant_affaire
-                }
-
-                montants.append(global_user)
-                montant_manuel = 0
-                montant_resiliation = 0
-                montant_affaire = 0
-        context = {
-            'montants': montants,
-        }
-
-        return render(request, 'scl/dashboard.html', context)
-
-    def test_func(self):
-        """
-        Check if request.user is in Admin
-        :return: True or False
-        """
-        return self.request.user.groups.filter(name='Admin')
-
-
 class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         """
@@ -675,7 +445,6 @@ class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
         :return: dashboard.html
         """
         query = self.request.GET.get("q")
-        query_date_filter = datetime.strptime(query, "%Y-%m-%d")
 
         montants = []
         montant_resiliation = 0
@@ -687,14 +456,24 @@ class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
         for name in user_id:
             user = User.objects.get(id=name)
             if user.groups.filter(name='Caissier'):
-                encaissement = manuel.objects.filter(user=name, date_ajout__year=query_date_filter.year,
-                                                     date_ajout__month=query_date_filter.month,
-                                                     date_ajout__day=query_date_filter.day)
-                aff = affaire.objects.filter(user=name, date_ajout__year=query_date_filter.year,
-                                             date_ajout__month=query_date_filter.month,
-                                             date_ajout__day=query_date_filter.day)
-                resil = resiliation.objects.filter(user=name, date_ajout__year=query_date_filter.year,
-                                                   date_ajout__month=query_date_filter.month,
+                if query is None:
+                    encaissement = manuel.objects.filter(user=name, date_ajout__year=today.year,
+                                                     date_ajout__month=today.month, date_ajout__day=today.day)
+                    aff = affaire.objects.filter(user=name, date_ajout__year=today.year, date_ajout__month=today.month,
+                                                date_ajout__day=today.day)
+                    resil = resiliation.objects.filter(user=name, date_ajout__year=today.year,
+                                                   date_ajout__month=today.month, date_ajout__day=today.day)
+
+                else:
+                    query_date_filter = datetime.strptime(query, "%Y-%m-%d")
+                    encaissement = manuel.objects.filter(user=name, date_ajout__year=query_date_filter.year,
+                                                        date_ajout__month=query_date_filter.month,
+                                                        date_ajout__day=query_date_filter.day)
+                    aff = affaire.objects.filter(user=name, date_ajout__year=query_date_filter.year,
+                                                date_ajout__month=query_date_filter.month,
+                                                date_ajout__day=query_date_filter.day)
+                    resil = resiliation.objects.filter(user=name, date_ajout__year=query_date_filter.year,
+                                                    date_ajout__month=query_date_filter.month,
                                                    date_ajout__day=query_date_filter.day)
 
                 for manu in encaissement:

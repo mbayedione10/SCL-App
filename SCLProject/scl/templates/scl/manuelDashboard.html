@@ -16,7 +16,7 @@
             <form method="GET" action="{% url 'manuel-search' %}">
             <div class="md-form mt-0 active-cyan-2">
                 <input type="date" name="q" class="form-control" aria-label="Search" required value="{{ request.GET.q }}">
-                <button type="submit" class="btn btn-blue" data-toggle="modal">Rechercher</button><a href="{% url 'manuelDashboard' %}">Retour</a>
+                <button type="submit" class="btn btn-blue" data-toggle="modal">Rechercher</button><a href="{% url 'manuel-search' %}">Retour</a>
             </div>
         </form>
         </div>
