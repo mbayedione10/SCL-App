@@ -12,7 +12,6 @@ urlpatterns = [
 
     # Resiliations
     path('resiliation/', AjouterResiliation.as_view(), name='resiliation'),
-    path('resiliation/dashboard/', ResiliationDashboard.as_view(), name='resiliationDashboard' ),
     path('resiliation/search', SearchResiliationDashboard.as_view(), name='resiliation-search' ),
     path('updateResiliation/<int:pk>', UpdateResiliation.as_view(), name='update-resiliation' ),
 

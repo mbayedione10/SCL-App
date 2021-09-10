@@ -393,25 +393,38 @@ class ManuelDashboard(View):
 class SearchResiliationDashboard(UserPassesTestMixin, LoginRequiredMixin, View):
     def get(self, request):
         """
-        Table of 'Resiliation' type operations done daily
+        By default Table of 'Resiliation' type operations done Today
         if request.user is a 'Caissier' show his own else show all
         check if in the GET method there are "q" like q=yyyy-mm-dd
         :param request: GET
         :return: resiliationDashboard.html
         """
         query = self.request.GET.get("q")
-        query_date_filter = datetime.strptime(query, "%Y-%m-%d")
+        
+        if query is None:
+            resil = resiliation.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
+                                            date_ajout__day=today.day)
+        else:
+            resil = resiliation.objects.filter(Q(date_ajout__icontains=query))
 
-        resil = resiliation.objects.filter(Q(date_ajout__icontains=query))
         nombre_resiliation = 0
         montant_total = 0
         all_resiliation = []
         user_id = request.user.id
 
         if request.user.groups.filter(name='Caissier'):
-            resil = resiliation.objects.filter(user=user_id, date_ajout__year=query_date_filter.year,
-                                               date_ajout__month=query_date_filter.month,
-                                               date_ajout__day=query_date_filter.day)
+        
+            if query is None:
+                resil = resiliation.objects.filter(user=user_id,date_ajout__year=today.year, date_ajout__month=today.month,
+                                            date_ajout__day=today.day)
+            else:
+                query_date_filter = datetime.strptime(query, "%Y-%m-%d")
+                resil = resiliation.objects.filter(
+                    Q(date_ajout__year=query_date_filter.year) &
+                    Q(date_ajout__month=query_date_filter.month) &
+                    Q(date_ajout__day=query_date_filter.day) &
+                    Q(user=user_id))
+
             for name in resil:
                 added_by = [user.username for user in User.objects.filter(resiliation=name)]
                 montant_total += name.montant_a_payer
