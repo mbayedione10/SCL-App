@@ -8,7 +8,8 @@ from django.contrib.auth.models import Group, User
 
 class TestViews(TestCase):
     def setUp(self):
-        self.client = Client()
+        self.client_admin = Client()
+        self.client_caissier = Client()
         self.index_url = reverse('index')
 
         # Manuel
@@ -29,58 +30,101 @@ class TestViews(TestCase):
 
         #create permissions group
         group_name = "Admin"
-        self.group = Group(name=group_name)
-        self.group.save()
-        # Create a new user
-        self.user = User.objects.create_superuser(
+        self.group_admin = Group(name=group_name)
+        group_name2 = "Caissier"
+        self.group_caissier = Group(name=group_name2)
+        self.group_admin.save()
+        self.group_caissier.save()
+
+        # Create a new user Admin
+        self.user_admin = User.objects.create_superuser(
             username = 'foo',
             email = 'myemail@test.com',
             password = 'pass',
         )
         # Add group on new user created
-        self.user.groups.add(self.group)
-        self.user.save()
-        
-        self.logged_in = self.client.login(
+        self.user_admin.groups.add(self.group_admin)
+        self.user_admin.save()
+        self.logged_in_admin = self.client_admin.login(
             username='foo',
             password='pass'
         )
 
 
+        # Create a new user Caissier
+        self.user_caissier = User.objects.create_superuser(
+            username = 'foo_caissier',
+            email = 'myemail_caissier@test.com',
+            password = 'pass_caissier',
+        )
+        # Add group on new user created
+        self.user_caissier.groups.add(self.group_caissier)
+        self.user_caissier.save()
+        self.logged_in_caissier = self.client_caissier.login(
+            username='foo_caissier',
+            password='pass_caissier'
+        )
+
     def test_index_GET(self):
 
-        response = self.client.get(self.index_url)
+        response_caissier = self.client_caissier.get(self.index_url)
+        response_admin = self.client_admin.get(self.index_url)
         
-        if self.logged_in:    # check login success
+        if self.logged_in_admin and self.logged_in_caissier:    # check if login success and user in groups
 
-            self.assertEqual(response.status_code, 200, u'user in group should have access')
-            self.assertTemplateUsed(response,'scl/index.html')
-            self.assertTemplateUsed(response,'scl/base.html')
-            self.assertTemplateUsed(response,'scl/navigation.html')
-            self.assertTemplateUsed(response,'scl/footer.html')
+            # Admin
+            self.assertEqual(response_admin.status_code, 200, u'user in group should have access')
+            self.assertTemplateUsed(response_admin,'scl/index.html')
+            self.assertTemplateUsed(response_admin,'scl/base.html')
+            self.assertTemplateUsed(response_admin,'scl/navigation.html')
+            self.assertTemplateUsed(response_admin,'scl/footer.html')
+            # Caissier
+            self.assertEqual(response_caissier.status_code, 200, u'user in group should have access')
+            self.assertTemplateUsed(response_caissier,'scl/index.html')
+            self.assertTemplateUsed(response_caissier,'scl/base.html')
+            self.assertTemplateUsed(response_caissier,'scl/navigation.html')
+            self.assertTemplateUsed(response_caissier,'scl/footer.html')
 
         else:
 
-            self.assertEquals(response.status_code,302)
-            print(response.json)
-            print("check login ", self.logged_in)
+            # self.assertEquals(response.status_code,302)
+            print("check login admin", self.logged_in_admin)
+            print(response_admin.json)
+            print("admin status code", response_admin.status_code)
 
+            print("check login caissier", self.logged_in_caissier)
+            print(response_caissier.json)
+            print("caissier status code",response_caissier.status_code)
 
+    # TODO add test for POST
 
     #Manuel
-    def test_ajouter_manuel_urls(self):
-        response = self.client.get(self.ajouter_manuel)
+    def test_ajouter_manuel_views(self):
+        response_caissier = self.client_caissier.get(self.ajouter_manuel)
+        response_admin = self.client_admin.get(self.ajouter_manuel)
         
-        if self.logged_in:    # check login success
+        if self.logged_in_admin and self.logged_in_caissier:    # check login success and user in groups
 
-            self.assertEquals(response.status_code,200)
-            self.assertTemplateUsed(response,'scl/manuel.html')
-            self.assertTemplateUsed(response,'scl/base.html')
-            self.assertTemplateUsed(response,'scl/navigation.html')
-            self.assertTemplateUsed(response,'scl/footer.html')
+            # Admin
+            self.assertEqual(response_admin.status_code, 200, u'user in group should have access')
+            self.assertTemplateUsed(response_admin,'scl/manuel.html')
+            self.assertTemplateUsed(response_admin,'scl/base.html')
+            self.assertTemplateUsed(response_admin,'scl/navigation.html')
+            self.assertTemplateUsed(response_admin,'scl/footer.html')
+            # Caissier
+            self.assertEqual(response_caissier.status_code, 200, u'user in group should have access')
+            self.assertTemplateUsed(response_caissier,'scl/manuel.html')
+            self.assertTemplateUsed(response_caissier,'scl/base.html')
+            self.assertTemplateUsed(response_caissier,'scl/navigation.html')
+            self.assertTemplateUsed(response_caissier,'scl/footer.html')
 
         else:
 
-            self.assertEquals(response.status_code,302)
-            print(response.json)
-            print("check login ", self.logged_in)
+            print("check login admin", self.logged_in_admin)
+            print(response_admin.json)
+            print("admin status code", response_admin.status_code)
+
+            print("check login caissier", self.logged_in_caissier)
+            print(response_caissier.json)
+            print("caissier status code",response_caissier.status_code)
+    
