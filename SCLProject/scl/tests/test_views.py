@@ -70,7 +70,6 @@ class TestViews(TestCase):
 
         response_caissier = self.client_caissier.get(self.index_url)
         response_admin = self.client_admin.get(self.index_url)
-        
         if self.logged_in_admin and self.logged_in_caissier:    # check if login success and user in groups
 
             # Admin
@@ -113,16 +112,12 @@ class TestViews(TestCase):
             print(response.json)
             print(response.status_code)
 
-            
-        
 
     #Manuel
     def test_ajouter_manuel_GET(self):
         response_caissier = self.client_caissier.get(self.ajouter_manuel)
         response_admin = self.client_admin.get(self.ajouter_manuel)
-        
         if self.logged_in_admin and self.logged_in_caissier:    # check login success and user in groups
-
             # Admin
             self.assertEqual(response_admin.status_code, 200, u'user in group should have access')
             self.assertTemplateUsed(response_admin,'scl/manuel.html')
@@ -149,9 +144,7 @@ class TestViews(TestCase):
     def test_dashboard_manuel_views(self):
         response_caissier = self.client_caissier.get(self.search_manuel)
         response_admin = self.client_admin.get(self.search_manuel)
-        
         if self.logged_in_admin and self.logged_in_caissier:    # check login success and user in groups
-
             # Admin
             self.assertEqual(response_admin.status_code, 200, u'user in group should have access')
             self.assertTemplateUsed(response_admin,'scl/manuelDashboard.html')

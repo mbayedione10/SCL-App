@@ -200,7 +200,6 @@ class SearchResiliationDashboard(UserPassesTestMixin, LoginRequiredMixin, View):
         :return: resiliationDashboard.html
         """
         query = self.request.GET.get("q")
-        
         if query is None:
             resil = resiliation.objects.filter(date_ajout__year=today.year, date_ajout__month=today.month,
                                             date_ajout__day=today.day)
@@ -291,7 +290,6 @@ class SearchAffaireDashboard(View):
                                             date_ajout__day=today.day)
         else:
             aff = affaire.objects.filter(Q(date_ajout__icontains=query))
-            
         nombre_affaire = 0
         montant_total = 0
         all_affaire = []
