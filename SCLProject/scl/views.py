@@ -61,12 +61,11 @@ class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
                 new_manuel.save()
 
                 return redirect('index')
-            else:
-                form = ManuelForm()
-                context = {
-                    'form': form,
-                }
-                return render(request, 'scl/manuel.html', context)
+            form = ManuelForm()
+            context = {
+                'form': form,
+            }
+            return render(request, 'scl/manuel.html', context)
 
     def test_func(self):
         """
@@ -123,12 +122,11 @@ class AjouterResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
                 new_resiliation.save()
 
                 return redirect('index')
-            else:
-                form = ResiliationForm
-                context = {
-                    'form': form,
-                }
-                return render(request, 'scl/resiliation.html', context)
+            form = ResiliationForm
+            context = {
+                'form': form,
+            }
+            return render(request, 'scl/resiliation.html', context)
 
     def test_func(self):
         """
@@ -175,12 +173,11 @@ class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
 
                 new_affaire.save()
                 return redirect('index')
-            else:
-                form = AffaireForm
-                context = {
-                    'form': form,
-                }
-                return render(request, 'scl/affaire.html', context)
+            form = AffaireForm
+            context = {
+                'form': form,
+            }
+            return render(request, 'scl/affaire.html', context)
 
     def test_func(self):
         """
