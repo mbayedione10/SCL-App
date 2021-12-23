@@ -107,7 +107,7 @@ class TestViews(TestCase):
                 'nom_client': 'sffg sdff',
                 'contact_client': '771234567'
             })
-        
+
         if self.logged_in_caissier:
             print(response.json)
             print(response.status_code)
