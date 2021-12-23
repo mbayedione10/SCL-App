@@ -48,7 +48,7 @@ class TestUrls(SimpleTestCase):
         print(resolve(url))
         self.assertEqual(resolve(url).func.view_class, AjouterAffaire)
 
-    def test_update_resiliatiion_url_resolves(self):
+    def test_update_affaire_url_resolves(self):
         url = reverse('update-affaire', args = '1')
         print(resolve(url))
         self.assertEqual(resolve(url).func.view_class, UpdateAffaire)
