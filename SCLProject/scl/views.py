@@ -16,7 +16,8 @@ from django.db.models import Q
 class Index(LoginRequiredMixin, UserPassesTestMixin, View):
     """GET request to render the HTML template index"""
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         return render(request, 'scl/index.html')
 
     def test_func(self):
@@ -24,7 +25,8 @@ class Index(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request):
+    @staticmethod
+    def get(request):
         """
         Form for manual operations
         :param request: GET
@@ -36,7 +38,8 @@ class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(request, 'scl/manuel.html', context)
 
-    def post(self, request):
+    @staticmethod
+    def post(request):
         """
         :param request: POST
         if POST done
@@ -76,7 +79,8 @@ class AjouterManuel(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class AjouterResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request):
+    @staticmethod
+    def get(request):
         """
         Form for Cancel operations
         :param request: GET
@@ -88,7 +92,8 @@ class AjouterResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(request, 'scl/resiliation.html', context)
 
-    def post(self, request):
+    @staticmethod
+    def post(request):
         """
         if form is valid, calculate other fields based on the number of months entered by operator
         :param request: POST
@@ -137,7 +142,8 @@ class AjouterResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request):
+    @staticmethod
+    def get(request):
         """
         Form for 'Affaires' operations
         :param request: GET
@@ -149,7 +155,8 @@ class AjouterAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(request, 'scl/affaire.html', context)
 
-    def post(self, request):
+    @staticmethod
+    def post(request):
         """
         if form is valid, add fields excluded in AffaireForm
         :param request: POST
@@ -503,7 +510,8 @@ class SearchDashboard(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class UpdateResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, pk):
+    @staticmethod
+    def get(request, pk):
         """
         Retrieve information from an operation using its id
         :param request: GET
@@ -515,7 +523,8 @@ class UpdateResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
             form = ResiliationForm(instance=resil)
             return render(request, 'scl/update-resiliation.html', {'form': form})
 
-    def post(self, request, pk):
+    @staticmethod
+    def post(request, pk):
         """
         check name in button update or delete operation by his id
         :param request: POST
@@ -556,7 +565,8 @@ class UpdateResiliation(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class UpdateAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, pk):
+    @staticmethod
+    def get(request, pk):
         """
         Retrieve information from an operation using its id
         :param request: GET
@@ -570,7 +580,8 @@ class UpdateAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(request, 'scl/update-affaire.html', context)
 
-    def post(self, request, pk):
+    @staticmethod
+    def post(request, pk):
         """
         check name in button update or delete operation by his id
         :param request: POST
@@ -597,7 +608,8 @@ class UpdateAffaire(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class UpdateManuel(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, pk):
+    @staticmethod
+    def get(request, pk):
         """
         Retrieve information from an operation using its id
         :param request: GET
@@ -611,7 +623,8 @@ class UpdateManuel(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(request, 'scl/update-manuel.html', context)
 
-    def post(self, request, pk):
+    @staticmethod
+    def post(request, pk):
         """
         check name in button update or delete operation by his id
         :param request: POST
