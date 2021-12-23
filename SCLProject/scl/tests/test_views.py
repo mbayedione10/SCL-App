@@ -146,7 +146,6 @@ class TestViews(TestCase):
             print(response_caissier.json)
             print("caissier status code",response_caissier.status_code)
     
-<<<<<<< HEAD
     def test_dashboard_manuel_views(self):
         response_caissier = self.client_caissier.get(self.search_manuel)
         response_admin = self.client_admin.get(self.search_manuel)
@@ -206,5 +205,3 @@ class TestViews(TestCase):
             print("caissier status code",response_caissier.status_code)
 
 """
-=======
->>>>>>> a848714f108ca27f12e44a16fc03842018dc8ef5
