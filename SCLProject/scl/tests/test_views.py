@@ -1,10 +1,11 @@
 from django import test
+from django.http.request import HttpRequest
 from django.test import TestCase,  Client
 from django.urls import reverse
 from scl.models import *
 import json
 from django.contrib.auth.models import Group, User
-
+from django.utils import timezone
 
 class TestViews(TestCase):
     def setUp(self):
@@ -97,9 +98,26 @@ class TestViews(TestCase):
             print("caissier status code",response_caissier.status_code)
 
     # TODO add test for POST
+    def test_ajouter_manuel_POST(self):
+        response = self.client_caissier.post(self.ajouter_manuel,{
+                'motif_reglement': 'extension reseau',
+                'mode_payement': 'Espéces',
+                'montant': 100000,
+                'contrat': '15425-526421',
+                'village': 'dksdjf',
+                'nom_client': 'sffg sdff',
+                'contact_client': '771234567'
+            })
+        
+        if self.logged_in_caissier:
+            print(response.json)
+            print(response.status_code)
+
+            
+        
 
     #Manuel
-    def test_ajouter_manuel_views(self):
+    def test_ajouter_manuel_GET(self):
         response_caissier = self.client_caissier.get(self.ajouter_manuel)
         response_admin = self.client_admin.get(self.ajouter_manuel)
         
@@ -128,3 +146,62 @@ class TestViews(TestCase):
             print(response_caissier.json)
             print("caissier status code",response_caissier.status_code)
     
+    def test_dashboard_manuel_views(self):
+        response_caissier = self.client_caissier.get(self.search_manuel)
+        response_admin = self.client_admin.get(self.search_manuel)
+        
+        if self.logged_in_admin and self.logged_in_caissier:    # check login success and user in groups
+
+            # Admin
+            self.assertEqual(response_admin.status_code, 200, u'user in group should have access')
+            self.assertTemplateUsed(response_admin,'scl/manuelDashboard.html')
+            self.assertTemplateUsed(response_admin,'scl/base.html')
+            self.assertTemplateUsed(response_admin,'scl/navigation.html')
+            self.assertTemplateUsed(response_admin,'scl/footer.html')
+            # Caissier
+            self.assertEqual(response_caissier.status_code, 200, u'user in group should have access')
+            self.assertTemplateUsed(response_caissier,'scl/manuelDashboard.html')
+            self.assertTemplateUsed(response_caissier,'scl/base.html')
+            self.assertTemplateUsed(response_caissier,'scl/navigation.html')
+            self.assertTemplateUsed(response_caissier,'scl/footer.html')
+
+        else:
+
+            print("check login admin", self.logged_in_admin)
+            print(response_admin.json)
+            print("admin status code", response_admin.status_code)
+
+            print("check login caissier", self.logged_in_caissier)
+            print(response_caissier.json)
+            print("caissier status code",response_caissier.status_code)
+"""
+    def test_update_manuel_views(self):
+        response_caissier = self.client_caissier.get(self.update_manuel)
+        response_admin = self.client_admin.get(self.update_manuel)
+        
+        if self.logged_in_admin:    # check login success and user in groups
+
+            # Admin
+            self.assertEqual(response_admin.status_code, 200, u'user in group should have access')
+            self.assertTemplateUsed(response_admin,'scl/update-manuel.html')
+            self.assertTemplateUsed(response_admin,'scl/base.html')
+            self.assertTemplateUsed(response_admin,'scl/navigation.html')
+            self.assertTemplateUsed(response_admin,'scl/footer.html')
+            # # Caissier
+            # self.assertEqual(response_caissier.status_code, 200, u'user in group should have access')
+            # self.assertTemplateUsed(response_caissier,'scl/update-manuel.html')
+            # self.assertTemplateUsed(response_caissier,'scl/base.html')
+            # self.assertTemplateUsed(response_caissier,'scl/navigation.html')
+            # self.assertTemplateUsed(response_caissier,'scl/footer.html')
+
+        else:
+
+            print("check login admin", self.logged_in_admin)
+            print(response_admin.json)
+            print("admin status code", response_admin.status_code)
+
+            print("check login caissier", self.logged_in_caissier)
+            print(response_caissier.json)
+            print("caissier status code",response_caissier.status_code)
+
+"""
