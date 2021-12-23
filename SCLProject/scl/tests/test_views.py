@@ -145,7 +145,7 @@ class TestViews(TestCase):
             print("check login caissier", self.logged_in_caissier)
             print(response_caissier.json)
             print("caissier status code",response_caissier.status_code)
-    
+
     def test_dashboard_manuel_views(self):
         response_caissier = self.client_caissier.get(self.search_manuel)
         response_admin = self.client_admin.get(self.search_manuel)
@@ -178,7 +178,7 @@ class TestViews(TestCase):
     def test_update_manuel_views(self):
         response_caissier = self.client_caissier.get(self.update_manuel)
         response_admin = self.client_admin.get(self.update_manuel)
-        
+
         if self.logged_in_admin:    # check login success and user in groups
 
             # Admin

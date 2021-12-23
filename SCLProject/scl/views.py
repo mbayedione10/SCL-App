@@ -216,7 +216,7 @@ class SearchResiliationDashboard(UserPassesTestMixin, LoginRequiredMixin, View):
         user_id = request.user.id
 
         if request.user.groups.filter(name='Caissier'):
-        
+
             if query is None:
                 resil = resiliation.objects.filter(user=user_id,date_ajout__year=today.year, date_ajout__month=today.month,
                                             date_ajout__day=today.day)
