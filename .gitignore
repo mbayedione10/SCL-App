@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 
-static/
+#static/
 
 .idea/
 .vscode/
